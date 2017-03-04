@@ -6,15 +6,11 @@ import MessagePackage.MessageManagerInterface;
 /**
  * Created by yazid on 03-Mar-17.
  */
-public abstract class MaintainableDevice implements Runnable{
+public abstract class MaintainableDevice{
 
     private boolean isStarted=false;
     private int msgID;
     private String text;
-    //Inherit this in every device you use
-    public MaintainableDevice(){
-        //TODO Yazid: fill this
-    }
 
     //After registering to the message manager, call this method
     //The message format is "name:description"
@@ -33,10 +29,5 @@ public abstract class MaintainableDevice implements Runnable{
         } catch(Exception e) {
             e.printStackTrace();
         }
-    }
-
-    public void run()
-    {
-
     }
 }
