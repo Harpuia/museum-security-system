@@ -11,8 +11,8 @@ import java.util.HashMap;
 /**
  * Created by Yuchao on 03/03/2017.
  */
-public class BaseMonitor extends MaintainableDevice {
-    protected final int HULT_MSGID = 99;
+public class BaseMonitor extends MaintainableDevice implements Runnable {
+    protected final int HALT_MSGID = 99;
 
     protected MessageManagerInterface msgMgrInterface;
     protected String msgMgrIP;
@@ -20,12 +20,6 @@ public class BaseMonitor extends MaintainableDevice {
     protected MessageWindow msgWin;
     protected HashMap<Integer, Message> dataFromSensor = new HashMap<>();
 
-    private Console console;
-
-
-    public BaseMonitor (Console console) {
-        this.console = console;
-    }
 
     public BaseMonitor () {
         try {
@@ -35,7 +29,7 @@ public class BaseMonitor extends MaintainableDevice {
             registered = false;
         }
 
-        dataFromSensor.put (HULT_MSGID, null);
+        dataFromSensor.put (HALT_MSGID, null);
     }
 
     public BaseMonitor (String msgIpAddress) {
@@ -47,7 +41,7 @@ public class BaseMonitor extends MaintainableDevice {
             registered = false;
         }
 
-        dataFromSensor.put (HULT_MSGID, null);
+        dataFromSensor.put (HALT_MSGID, null);
     }
 
     public boolean isRegistered () {
@@ -56,7 +50,7 @@ public class BaseMonitor extends MaintainableDevice {
 
     public void halt () {
         msgWin.WriteMessage( "***HALT MESSAGE RECEIVED - SHUTTING DOWN SYSTEM***" );
-        Message msg = new Message (HULT_MSGID, "XXX" );
+        Message msg = new Message (HALT_MSGID, "XXX" );
 
         try {
             msgMgrInterface.SendMessage (msg);
@@ -84,7 +78,5 @@ public class BaseMonitor extends MaintainableDevice {
     }
 
     @Override
-    public void run() {
-        console.printMsg();
-    }
+    public void run() {}
 }
