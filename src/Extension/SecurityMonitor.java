@@ -1,6 +1,7 @@
 package Extension;
 
 import InstrumentationPackage.MessageWindow;
+import MessagePackage.Message;
 
 import static java.lang.Thread.sleep;
 
@@ -9,6 +10,7 @@ import static java.lang.Thread.sleep;
  */
 public class SecurityMonitor extends BaseMonitor {
     private final int FIRE_MSGID = 6;
+    private final int SPRINKLER_MSGID = 7;
     private final int delay = 1000;
     private SecurityState state;
     //Monitor can call all console's public methods
@@ -32,13 +34,9 @@ public class SecurityMonitor extends BaseMonitor {
     }
 
     public void controlFire () {
-        /*
-        try {
-            sleep(10000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        */
+        Message msg = dataFromSensor.get(FIRE_MSGID);
+        String fireMsgTxt = msg.GetMessage();
+        msgWin.WriteMessage(fireMsgTxt);
         state.setHasAlarm(true);
     }
 
@@ -58,14 +56,47 @@ public class SecurityMonitor extends BaseMonitor {
             while (true) {
                 readMsg();
                 //TODO: ADD ACTION HERE
-                controlIntrusion();
-                controlFire();
-                break;
-            }
-            try {
-                sleep (delay);
-            } catch (InterruptedException e) {
-                System.out.println ("Error::" + e);
+                //controlIntrusion();
+                //controlFire();
+
+                if (dataFromSensor.get(FIRE_MSGID) != null) {
+                    msgWin.WriteMessage("Enters controlFire");
+                    controlFire();
+                } else if (dataFromSensor.get(HALT_MSGID) != null) {
+                    try {
+                        msgMgrInterface.UnRegister();
+                    } catch (Exception e) {
+                        msgWin.WriteMessage("Error unregistering: " + e);
+                    }
+
+                    msgWin.WriteMessage("\n\nSimulation stopped.\n");
+                    break;
+                }
+
+                dataFromSensor.put(FIRE_MSGID, null);
+
+                if(state.getSprinklerOn()) {
+                    Message msgToSend = new Message(SPRINKLER_MSGID, "S1");
+                    try {
+                        msgMgrInterface.SendMessage(msgToSend);
+                    } catch (Exception e) {
+                        System.out.println("Error sending sprinkler control message:: " + e);
+                    }
+                } else {
+                    Message msgToSend = new Message(SPRINKLER_MSGID, "S0");
+                    try {
+                        msgMgrInterface.SendMessage(msgToSend);
+                    } catch (Exception e) {
+                        System.out.println("Error sending sprinkler control message::" + e);
+                    }
+                }
+
+                //state.setHasAlarm(true);
+                try {
+                    sleep (delay);
+                } catch (InterruptedException e) {
+                    System.out.println ("Error::" + e);
+                }
             }
         } else {
             System.out.println ("Unable to register with the message manager.");
