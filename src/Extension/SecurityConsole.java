@@ -1,45 +1,53 @@
 package Extension;
 
+import TermioPackage.Termio;
+
 /**
  * Created by yazid on 03-Mar-17.
  */
 public class SecurityConsole {
-    private SecurityMonitor securityMonitor;
-    private boolean done;
-    public void Arm(){
-        //TODO: code
-    }
-    public void Disarm(){
-        //TODO: code
-    }
+    public static void main(String[] args) {
+        Termio termio = new Termio();
 
-    protected void main(String[] args) {
-        securityMonitor = new SecurityMonitor(this);
+        String choice;
+
+        SecurityMonitor securityMonitor;
+        boolean done = false;
+        boolean armed = false;
+
+        securityMonitor = new SecurityMonitor();
         if (securityMonitor.isRegistered()) {
             Thread monitorThread = new Thread(securityMonitor);
             monitorThread.start();
             while (!done) {
-                //TODO: implement logic here
-                System.out.println("Choose something from 1 to 5:");
-                //Scan input
-                //input to int
-                if(true/*input can be parsed as int*/){
-                int i=0;
-                switch(i){
-                    case 1:
-                        //Arm
-                        securityMonitor.arm();
-                        break;
-                    case 2:
-                        //do something
-                        break;
-                    default:
-                        //Display "Error, choose a value in 1-5"
-                        break;
+                System.out.println("Input command:");
+                if (armed) {
+                    System.out.println("1 = disarm security system");
+                } else {
+                    System.out.println("1 = arm security system");
                 }
-                }
-                else{
-                    System.out.println("Error, choose a value in 1-5");
+
+                choice = termio.KeyboardReadString();
+                int intChoice = termio.ToInteger(choice);
+
+                if (intChoice > 0) {
+                    switch (intChoice) {
+                        case 1:
+                            if (armed) {
+                                securityMonitor.disarm();
+                                armed = false;
+                            } else {
+                                securityMonitor.arm();
+                                armed = true;
+                            }
+
+                            break;
+                        default:
+                            System.out.println("Error, choice invalid.");
+                            break;
+                    }
+                } else {
+                    System.out.println("Error, choice invalid.");
                 }
             }
         }
