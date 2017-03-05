@@ -13,6 +13,7 @@ import static java.lang.Thread.sleep;
  */
 public class SecurityConsoleLauncher extends MaintainableDevice {
     private final String LOOPBACK_IP = "127.0.0.1";
+    private final int SLEEP_MILLISECONDS = 200;
     private BaseMonitor monitor;
     private SecurityConsole console;
     private SecurityState state = new SecurityState();
@@ -48,10 +49,23 @@ public class SecurityConsoleLauncher extends MaintainableDevice {
         }
     }
 
-    private void listenToAlarm() {
+    private void listenToAlarm(boolean hasAlarm) {
         try {
-            while (!state.getHasAlarm()) {
-                sleep(1000);
+            while (state.getHasAlarm() == hasAlarm) {
+                sleep(200);
+            }
+        } catch (InterruptedException e) {
+            System.out.println("The console has been ended...");
+        }
+    }
+
+    private void listenToAlarm(boolean hasAlarm, int dogFood) {
+        int count = dogFood / SLEEP_MILLISECONDS;
+        try {
+            int i = 0;
+            while ((state.getHasAlarm() == hasAlarm) && i < count) {
+                sleep(SLEEP_MILLISECONDS);
+                i++;
             }
         } catch (InterruptedException e) {
             System.out.println("The console has been ended...");
@@ -103,14 +117,22 @@ public class SecurityConsoleLauncher extends MaintainableDevice {
         console = constructConsole(args);
 
         if (monitor.isRegistered()) {
-            monitor.run();
-            console.run();
-            listenToAlarm();
+            //monitor.run();
+            //console.run();
+            new Thread(monitor).start();
+            console.start();
 
-            if (state.getHasAlarm()) {
-                //handleAlarm();
-                console.shutdown();
-                console = constructConsole(args);
+            while(true) {
+                listenToAlarm(false);
+
+                if (state.getHasAlarm()) {
+                    //handleAlarm();
+                    console.shutdown();
+                    //console.interrupt();
+                    console = constructConsole(args);
+                    console.start();
+                }
+                listenToAlarm(true, 10000);
             }
 
         } else {

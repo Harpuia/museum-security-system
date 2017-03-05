@@ -8,7 +8,7 @@ import java.io.InputStreamReader;
 /**
  * Created by Yuchao on 03/03/2017.
  */
-public class SecurityConsole implements Runnable {
+public class SecurityConsole extends Thread {
     private final String LOOPBACK_IP = "127.0.0.1";
     private String msgMgrIP;
     private Termio userInput = new Termio();
