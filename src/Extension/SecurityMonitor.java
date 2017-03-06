@@ -122,32 +122,30 @@ public class SecurityMonitor extends MaintainableDevice implements Runnable {
         movementIndicator.SetLampColorAndMessage(SYSTEM_DISARMED, 0);
     }
 
-    public void Halt()
-    {
-        messageWindow.WriteMessage( "***HALT MESSAGE RECEIVED - SHUTTING DOWN SYSTEM***" );
+    public void Halt() {
+        messageWindow.WriteMessage("***HALT MESSAGE RECEIVED - SHUTTING DOWN SYSTEM***");
 
         // Here we create the stop message.
 
         Message msg;
 
-        msg = new Message( (int) 99, "XXX" );
+        msg = new Message((int) 99, "XXX");
 
         // Here we send the message to the message manager.
 
-        try
-        {
-            doorIndicator.dispose();
-            windowIndicator.dispose();
-            movementIndicator.dispose();
-            messageInterface.SendMessage( msg );
-        } // try
-
-        catch (Exception e)
-        {
+        try {
+            messageInterface.SendMessage(msg);
+        } catch (Exception e) {
             System.out.println("Error sending halt message:: " + e);
-
-        } // catch
-
+        }
+        doorIndicator.dispose();
+        windowIndicator.dispose();
+        movementIndicator.dispose();
+        try {
+            messageInterface.UnRegister();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -223,6 +221,9 @@ public class SecurityMonitor extends MaintainableDevice implements Runnable {
                                         lastDoorAlert = System.currentTimeMillis();
                                         break;
                                 }
+                            break;
+                        case 99:
+                            Halt();
                             break;
                         default:
                             break;

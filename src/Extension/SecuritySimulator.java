@@ -74,7 +74,7 @@ public class SecuritySimulator {
                     choice = termio.KeyboardReadString();
                     if (choice.equals("X")) {
                         Halt();
-                        System.out.println( "\nSecurity simulator stopped... Exit security monitor mindow to return to command prompt." );
+                        System.out.println( "\nSecurity simulator stopped... Exit security monitor window to return to command prompt." );
                         done = true;
                         Halt();
                     } else {
@@ -82,16 +82,19 @@ public class SecuritySimulator {
                         //1: door, 2:window, 3:movement
                         switch (intChoice) {
                             case 1:
-                                messageInterface.SendMessage(new Message(10, "M"));
-                                System.out.println("Movement message sent at " + System.currentTimeMillis());
-                                break;
-                            case 2:
                                 messageInterface.SendMessage(new Message(10, "D"));
                                 System.out.println("Door message sent at " + System.currentTimeMillis());
                                 break;
-                            case 3:
+                            case 2:
                                 messageInterface.SendMessage(new Message(10, "W"));
                                 System.out.println("Window message sent at " + System.currentTimeMillis());
+                                break;
+                            case 3:
+                                messageInterface.SendMessage(new Message(10, "M"));
+                                System.out.println("Movement message sent at " + System.currentTimeMillis());
+                                break;
+                            case 99:
+                                Halt();
                                 break;
                             default:
                                 System.out.println("Error, invalid choice.");
@@ -111,22 +114,20 @@ public class SecuritySimulator {
         System.out.println("***HALT MESSAGE RECEIVED - SHUTTING DOWN SYSTEM***");
 
         // Here we create the stop message.
-
         Message msg;
-
         msg = new Message((int) 99, "XXX");
 
         // Here we send the message to the message manager.
-
         try {
             messageInterface.SendMessage(msg);
-
-        } // try
-
+            try {
+                messageInterface.UnRegister();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
         catch (Exception e) {
             System.out.println("Error sending halt message:: " + e);
-
-        } // catch
-
+        }
     }
 }
