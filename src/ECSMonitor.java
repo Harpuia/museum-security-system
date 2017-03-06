@@ -25,8 +25,9 @@
 import InstrumentationPackage.*;
 import MessagePackage.*;
 import java.util.*;
+import Extension.MaintainableDevice;
 
-class ECSMonitor extends Thread
+class ECSMonitor extends MaintainableDevice implements Runnable
 {
 	private MessageManagerInterface em = null;	// Interface object to the message manager
 	private String MsgMgrIP = null;				// Message Manager IP address
@@ -85,6 +86,7 @@ class ECSMonitor extends Thread
 	} // Constructor
 
 	public void run()
+
 	{
 		Message Msg = null;				// Message object
 		MessageQueue eq = null;			// Message Queue
@@ -98,6 +100,7 @@ class ECSMonitor extends Thread
 
 		if (em != null)
 		{
+			SendAliveSignal("ECSMonitor","Hi, I'm the ECS monitor",em);
 			// Now we create the ECS status and message panel
 			// Note that we set up two indicators that are initially yellow. This is
 			// because we do not know if the temperature/humidity is high/low.
@@ -107,6 +110,7 @@ class ECSMonitor extends Thread
 			mw = new MessageWindow("ECS Monitoring Console", 0, 0);
 			ti = new Indicator ("TEMP UNK", mw.GetX()+ mw.Width(), 0);
 			hi = new Indicator ("HUMI UNK", mw.GetX()+ mw.Width(), (int)(mw.Height()/2), 2 );
+
 
 			mw.WriteMessage( "Registered with the message manager." );
 
