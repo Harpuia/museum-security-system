@@ -21,13 +21,13 @@
 *   void PostHumidity(MessageManagerInterface ei, float humidity )
 *
 ******************************************************************************************************************/
+import Extension.MaintainableDevice;
 import InstrumentationPackage.*;
 import MessagePackage.*;
 import java.util.*;
 
-class HumiditySensor
+class HumiditySensor extends MaintainableDevice
 {
-
 	public static void main(String args[])
 	{
 		String MsgMgrIP;					// Message Manager IP address
@@ -97,7 +97,9 @@ class HumiditySensor
 
 		if (em != null)
 		{
+			HumiditySensor hs=new HumiditySensor();
 
+			hs.SendAliveSignal("HumiditySensor", "Hi, I'm humidity sensor", em);
 			// We create a message window. Note that we place this panel about 1/2 across
 			// and 2/3s down the screen
 
