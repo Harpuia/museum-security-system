@@ -28,11 +28,12 @@
 *	static private void ConfirmMessage(MessageManagerInterface ei, String m )
 *
 ******************************************************************************************************************/
+import Extension.MaintainableDevice;
 import InstrumentationPackage.*;
 import MessagePackage.*;
 import java.util.*;
 
-class TemperatureController
+class TemperatureController extends MaintainableDevice
 {
 	public static void main(String args[])
 	{
@@ -99,6 +100,7 @@ class TemperatureController
 
 		if (em != null)
 		{
+			SendAliveSignal("TemperatureController", "Hi, I'm the temperature controller", em);
 			System.out.println("Registered with the message manager." );
 
 			/* Now we create the temperature control status and message panel
