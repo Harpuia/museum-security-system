@@ -8,7 +8,7 @@ import TermioPackage.Termio;
  * Created by yazid on 04-Mar-17.
  */
 //Message ID = 10
-public class SecuritySimulator {
+public class SecuritySimulator extends MaintainableDevice{
     private static MessageManagerInterface messageInterface = null;
 
     public static void main(String args[]) {
@@ -50,6 +50,8 @@ public class SecuritySimulator {
         }
 
         if (messageInterface != null) {
+
+            SendAliveSignal("SecuritySimulator", "Hi, I'm the security simulator", messageInterface);
             System.out.println("Registered with the message manager.");
 
             try {
