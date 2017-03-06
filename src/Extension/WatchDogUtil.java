@@ -8,8 +8,8 @@ import java.util.*;
  * Created by Jiawei on 2017/3/4.
  */
 public class WatchDogUtil {
-
-    final static int DOG_FOOD = 5;
+    // agreement: the number of DOG_FOOD represents how many second elapse for determining no-responding
+    final static int DOG_FOOD = 10;
 
     private List<DeviceRecord> deviceList;
     // assume each device has unique name
