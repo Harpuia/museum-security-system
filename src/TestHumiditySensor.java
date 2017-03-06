@@ -1,9 +1,10 @@
+import Extension.MaintainableDevice;
 import InstrumentationPackage.*;
 import MessagePackage.*;
 
 import java.util.*;
 
-class TestHumiditySensor {
+class TestHumiditySensor extends MaintainableDevice{
     private String MsgMgrIP;                    // Message Manager IP address
 
     private int MsgId = 0;                        // User specified message ID
@@ -11,6 +12,50 @@ class TestHumiditySensor {
     private float RelativeHumidity;                // Current simulated ambient room humidity
     private float DriftValue;                    // The amount of humidity gained or lost
 
+    public void doAnythingHere() {
+
+    }
+
+    public String getMsgMgrIP() {
+        return MsgMgrIP;
+    }
+
+    public void setMsgMgrIP(String msgMgrIP) {
+        MsgMgrIP = msgMgrIP;
+    }
+
+    public int getMsgId() {
+        return MsgId;
+    }
+
+    public void setMsgId(int msgId) {
+        MsgId = msgId;
+    }
+
+    public MessageManagerInterface getEm() {
+        return em;
+    }
+
+    public void setEm(MessageManagerInterface em) {
+        this.em = em;
+    }
+
+
+    public float getRelativeHumidity() {
+        return RelativeHumidity;
+    }
+
+    public void setRelativeHumidity(float relativeHumidity) {
+        RelativeHumidity = relativeHumidity;
+    }
+
+    public float getDriftValue() {
+        return DriftValue;
+    }
+
+    public void setDriftValue(float driftValue) {
+        DriftValue = driftValue;
+    }
     public void registerToMessageBus() {
         try {
             em = new MessageManagerInterface();
@@ -36,9 +81,10 @@ class TestHumiditySensor {
     }
 
     public static void main(String args[]) {
+
         boolean Done = false;                // Loop termination flag
         MessageQueue eq = null;                // Message Queue
-        HumiditySensor sensor = new HumiditySensor();
+        TestHumiditySensor sensor = new TestHumiditySensor();
         boolean HumidifierState = false;    // Humidifier state: false == off, true == on
         boolean DehumidifierState = false;    // Dehumidifier state: false == off, true == on
         Message Msg = null;                    // Message object
@@ -67,7 +113,7 @@ class TestHumiditySensor {
         // message manager interface was not properly created.
 
         if (sensor.isRegistered()) {
-
+            sensor.SendAliveSignal("TestSensor","hello~",sensor.getEm());
             // We create a message window. Note that we place this panel about 1/2 across
             // and 2/3s down the screen
 
@@ -318,49 +364,6 @@ class TestHumiditySensor {
     } // PostHumidity
 
 
-    public void doAnythingHere() {
 
-    }
-
-    public String getMsgMgrIP() {
-        return MsgMgrIP;
-    }
-
-    public void setMsgMgrIP(String msgMgrIP) {
-        MsgMgrIP = msgMgrIP;
-    }
-
-    public int getMsgId() {
-        return MsgId;
-    }
-
-    public void setMsgId(int msgId) {
-        MsgId = msgId;
-    }
-
-    public MessageManagerInterface getEm() {
-        return em;
-    }
-
-    public void setEm(MessageManagerInterface em) {
-        this.em = em;
-    }
-
-
-    public float getRelativeHumidity() {
-        return RelativeHumidity;
-    }
-
-    public void setRelativeHumidity(float relativeHumidity) {
-        RelativeHumidity = relativeHumidity;
-    }
-
-    public float getDriftValue() {
-        return DriftValue;
-    }
-
-    public void setDriftValue(float driftValue) {
-        DriftValue = driftValue;
-    }
 
 } // Humidity Sensor
