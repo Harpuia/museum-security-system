@@ -296,4 +296,7 @@ public class MessageWindow
 
 	} // WriteMessage
 
+	public void clearWindow(){
+		MessageArea.setText("");
+	}
 } // MessageWindow
