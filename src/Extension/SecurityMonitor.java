@@ -162,6 +162,8 @@ public class SecurityMonitor extends MaintainableDevice implements Runnable {
 
         this.SendAliveSignal("Security Monitor", "Security monitor and its console.", messageInterface);
         if (messageInterface != null) {
+
+            SendAliveSignal("SecurityMonitor", "Hi, I'm the security monitor", messageInterface);
             //Initial status display
             messageWindow.WriteMessage("Registered with the message manager.");
             try {
