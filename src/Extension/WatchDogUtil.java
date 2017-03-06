@@ -34,9 +34,9 @@ public class WatchDogUtil {
 
     public boolean isNewDevice(String name){
         if(!deviceNameSet.contains(name)){
-            return false;
+            return true;
         }
-        return true;
+        return false;
     }
 
     /**
