@@ -19,6 +19,7 @@ public class SecurityMonitor extends MaintainableDevice implements Runnable {
     private final String DOOR_OK = "Door OK";
     private final String WINDOW_OK = "Window OK";
     private final String NO_MOVEMENT = "No movement";
+    private final String SYSTEM_DISARMED = "System disarmed";
     private final long ALERT_DISPLAY_DURATION_MILLISECONDS = 10000;
 
     //Messaging variables
@@ -48,11 +49,11 @@ public class SecurityMonitor extends MaintainableDevice implements Runnable {
         //Initializing windows
         messageWindow = new MessageWindow("Security Monitor", 0, 100);
         doorIndicator = new Indicator("Door indicator", 200, 100);
-        doorIndicator.SetLampColorAndMessage(DOOR_OK, 1);
+        doorIndicator.SetLampColorAndMessage(SYSTEM_DISARMED, 0);
         windowIndicator = new Indicator("Window indicator", 200, 200);
-        windowIndicator.SetLampColorAndMessage(WINDOW_OK, 1);
+        windowIndicator.SetLampColorAndMessage(SYSTEM_DISARMED, 0);
         movementIndicator = new Indicator("Movement indicator", 200, 300);
-        movementIndicator.SetLampColorAndMessage(NO_MOVEMENT, 1);
+        movementIndicator.SetLampColorAndMessage(SYSTEM_DISARMED, 0);
 
         //Initializing variables
         registered = false;
@@ -97,17 +98,6 @@ public class SecurityMonitor extends MaintainableDevice implements Runnable {
         return (registered);
     }
 
-    public void halt() {
-        //msgWin.WriteMessage( "***HALT MESSAGE RECEIVED - SHUTTING DOWN SYSTEM***" );
-        Message msg = new Message(HALT_MSGID, "XXX");
-
-        try {
-            messageInterface.SendMessage(msg);
-        } catch (Exception e) {
-            System.out.println("Error sending halt message:: " + e);
-        }
-    }
-
     public void readMessageQueue() {
         try {
             messageQueue = messageInterface.GetMessageQueue();
@@ -118,10 +108,44 @@ public class SecurityMonitor extends MaintainableDevice implements Runnable {
 
     public void arm() {
         armed = true;
+        //Setting system state to OK
+        windowIndicator.SetLampColorAndMessage(WINDOW_OK, 1);
+        doorIndicator.SetLampColorAndMessage(DOOR_OK, 1);
+        movementIndicator.SetLampColorAndMessage(NO_MOVEMENT, 1);
     }
 
     public void disarm() {
         armed = false;
+        //Resetting indicators
+        windowIndicator.SetLampColorAndMessage(SYSTEM_DISARMED, 0);
+        doorIndicator.SetLampColorAndMessage(SYSTEM_DISARMED, 0);
+        movementIndicator.SetLampColorAndMessage(SYSTEM_DISARMED, 0);
+    }
+
+    public void Halt()
+    {
+        messageWindow.WriteMessage( "***HALT MESSAGE RECEIVED - SHUTTING DOWN SYSTEM***" );
+
+        // Here we create the stop message.
+
+        Message msg;
+
+        msg = new Message( (int) 99, "XXX" );
+
+        // Here we send the message to the message manager.
+
+        try
+        {
+            messageInterface.SendMessage( msg );
+
+        } // try
+
+        catch (Exception e)
+        {
+            System.out.println("Error sending halt message:: " + e);
+
+        } // catch
+
     }
 
     @Override
@@ -149,18 +173,20 @@ public class SecurityMonitor extends MaintainableDevice implements Runnable {
 
             //Looping
             while (!done) {
-                //Updating indicators
-                if (lastDoorAlert != null && (System.currentTimeMillis() - lastDoorAlert) > ALERT_DISPLAY_DURATION_MILLISECONDS) {
-                    doorIndicator.SetLampColorAndMessage(DOOR_OK, 1);
-                    lastDoorAlert = null;
-                }
-                if (lastWindowAlert != null && (System.currentTimeMillis() - lastWindowAlert) > ALERT_DISPLAY_DURATION_MILLISECONDS) {
-                    windowIndicator.SetLampColorAndMessage(WINDOW_OK, 1);
-                    lastWindowAlert = null;
-                }
-                if (lastMovementAlert != null && (System.currentTimeMillis() - lastMovementAlert) > ALERT_DISPLAY_DURATION_MILLISECONDS) {
-                    movementIndicator.SetLampColorAndMessage(DOOR_OK, 1);
-                    lastMovementAlert = null;
+                if (armed) {
+                    //Updating indicators
+                    if (lastDoorAlert != null && (System.currentTimeMillis() - lastDoorAlert) > ALERT_DISPLAY_DURATION_MILLISECONDS) {
+                        doorIndicator.SetLampColorAndMessage(DOOR_OK, 1);
+                        lastDoorAlert = null;
+                    }
+                    if (lastWindowAlert != null && (System.currentTimeMillis() - lastWindowAlert) > ALERT_DISPLAY_DURATION_MILLISECONDS) {
+                        windowIndicator.SetLampColorAndMessage(WINDOW_OK, 1);
+                        lastWindowAlert = null;
+                    }
+                    if (lastMovementAlert != null && (System.currentTimeMillis() - lastMovementAlert) > ALERT_DISPLAY_DURATION_MILLISECONDS) {
+                        movementIndicator.SetLampColorAndMessage(DOOR_OK, 1);
+                        lastMovementAlert = null;
+                    }
                 }
 
                 try {
@@ -173,7 +199,7 @@ public class SecurityMonitor extends MaintainableDevice implements Runnable {
                 messageQueueSize = messageQueue.GetSize();
                 for (int i = 0; i < messageQueueSize; i++) {
                     message = messageQueue.GetMessage();
-                    messageId=message.GetMessageId();
+                    messageId = message.GetMessageId();
                     switch (messageId) {
                         //Security alert message
                         case 10:

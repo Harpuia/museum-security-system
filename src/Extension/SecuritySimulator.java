@@ -2,17 +2,22 @@ package Extension;
 
 import MessagePackage.Message;
 import MessagePackage.MessageManagerInterface;
+import TermioPackage.Termio;
 
 /**
  * Created by yazid on 04-Mar-17.
  */
 //Message ID = 10
 public class SecuritySimulator {
+    private static MessageManagerInterface messageInterface = null;
+
     public static void main(String args[]) {
         String MsgMgrIP;
         boolean done = false;
 
-        MessageManagerInterface messageInterface = null;
+        Termio termio = new Termio();
+        String choice;
+        int intChoice;
 
         if (args.length == 0) {
             System.out.println("\n\nAttempting to register on the local machine...");
@@ -25,7 +30,7 @@ public class SecuritySimulator {
             } catch (Exception e) {
                 System.out.println("Error instantiating message manager interface: " + e);
 
-            } // catch
+            }
 
         } else {
 
@@ -59,8 +64,40 @@ public class SecuritySimulator {
             System.out.println("Beginning Simulation... ");
             while (!done) {
                 try {
-                    Thread.sleep(15000);
-                    messageInterface.SendMessage(new Message(10, "M"));
+                    System.out.println("Enter a choice: 1=door, 2=window, 3=movement");
+                    System.out.println("Select an Option: \n");
+                    System.out.println("1: simulate door breach");
+                    System.out.println("2: simulate window breach");
+                    System.out.println("3: simulate movement detection");
+                    System.out.println("X: Stop System\n");
+                    System.out.print("\n>>>> ");
+                    choice = termio.KeyboardReadString();
+                    if (choice.equals("X")) {
+                        Halt();
+                        System.out.println( "\nSecurity simulator stopped... Exit security monitor mindow to return to command prompt." );
+                        done = true;
+                        Halt();
+                    } else {
+                        intChoice = termio.ToInteger(choice);
+                        //1: door, 2:window, 3:movement
+                        switch (intChoice) {
+                            case 1:
+                                messageInterface.SendMessage(new Message(10, "M"));
+                                System.out.println("Movement message sent at " + System.currentTimeMillis());
+                                break;
+                            case 2:
+                                messageInterface.SendMessage(new Message(10, "D"));
+                                System.out.println("Door message sent at " + System.currentTimeMillis());
+                                break;
+                            case 3:
+                                messageInterface.SendMessage(new Message(10, "W"));
+                                System.out.println("Window message sent at " + System.currentTimeMillis());
+                                break;
+                            default:
+                                System.out.println("Error, invalid choice.");
+                                break;
+                        }
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -68,5 +105,28 @@ public class SecuritySimulator {
         } else {
             System.out.println("Unable to register with the message manager.\n\n");
         }
+    }
+
+    public static void Halt() {
+        System.out.println("***HALT MESSAGE RECEIVED - SHUTTING DOWN SYSTEM***");
+
+        // Here we create the stop message.
+
+        Message msg;
+
+        msg = new Message((int) 99, "XXX");
+
+        // Here we send the message to the message manager.
+
+        try {
+            messageInterface.SendMessage(msg);
+
+        } // try
+
+        catch (Exception e) {
+            System.out.println("Error sending halt message:: " + e);
+
+        } // catch
+
     }
 }

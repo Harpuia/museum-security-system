@@ -8,7 +8,6 @@ import TermioPackage.Termio;
 public class SecurityConsole {
     public static void main(String[] args) {
         Termio termio = new Termio();
-
         String choice;
 
         SecurityMonitor securityMonitor;
@@ -20,17 +19,24 @@ public class SecurityConsole {
             Thread monitorThread = new Thread(securityMonitor);
             monitorThread.start();
             while (!done) {
-                System.out.println("Input command:");
+                System.out.println("Select an Option: \n");
+                System.out.print("\n>>>> ");
                 if (armed) {
-                    System.out.println("1 = disarm security system");
+                    System.out.println("1: Disarm security system");
                 } else {
-                    System.out.println("1 = arm security system");
+                    System.out.println("1: Arm security system");
                 }
+                System.out.println("X: Stop System\n");
+                System.out.print("\n>>>> ");
 
                 choice = termio.KeyboardReadString();
-                int intChoice = termio.ToInteger(choice);
-
-                if (intChoice > 0) {
+                if (choice.equals("X")) {
+                    securityMonitor.Halt();
+                    System.out.println( "\nSecurity console Stopped... Exit security monitor mindow to return to command prompt." );
+                    done = true;
+                    securityMonitor.Halt();
+                } else {
+                    int intChoice = termio.ToInteger(choice);
                     switch (intChoice) {
                         case 1:
                             if (armed) {
@@ -40,14 +46,11 @@ public class SecurityConsole {
                                 securityMonitor.arm();
                                 armed = true;
                             }
-
                             break;
                         default:
-                            System.out.println("Error, choice invalid.");
+                            System.out.println("Error, invalid choice.");
                             break;
                     }
-                } else {
-                    System.out.println("Error, choice invalid.");
                 }
             }
         }
