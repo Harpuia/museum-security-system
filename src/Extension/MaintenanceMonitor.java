@@ -113,8 +113,15 @@ public class MaintenanceMonitor extends Thread {
     }
     // TODO: Add parsing the args for connecting remote message manager -> Huang Xin
     public static void main(String [] args) {
-        MaintenanceMonitor maintenMonitor=new MaintenanceMonitor();
-        maintenMonitor.start();
+        if(args[0].length()!=0) {
+            MaintenanceMonitor maintenMonitor = new MaintenanceMonitor(args[0]);
+            maintenMonitor.start();
+        }
+        else
+        {
+            MaintenanceMonitor maintenMonitor = new MaintenanceMonitor();
+            maintenMonitor.start();
+        }
     }
 
 }
