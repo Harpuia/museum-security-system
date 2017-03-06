@@ -10,7 +10,7 @@ public class DeviceRecord{
     private String name;
     private String description;
 
-    private int dogFood = -999;
+    private int dogFood = INVALID_DOG_FOOD;
 
     public DeviceRecord(long senderID, String name, String description) {
         this.senderID = senderID;
@@ -64,4 +64,12 @@ public class DeviceRecord{
         return false;
     }
 
+    @Override
+    public String toString() {
+        if(dogFood <= 0){
+            return name + " : " + description + "     no responding";
+        }else{
+            return name + " : " + description;
+        }
+    }
 }
