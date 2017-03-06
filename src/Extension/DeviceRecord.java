@@ -1,7 +1,9 @@
 package Extension;
 
-/**
- * Created by hitno on 2017/3/4.
+/*
+ * class DeviceRecord
+ * this class will store a device's name description and senderID
+ * 2017-03-04 Jiawei
  */
 public class DeviceRecord{
     final static int INVALID_DOG_FOOD = Integer.MAX_VALUE;
@@ -9,9 +11,10 @@ public class DeviceRecord{
     private long senderID;
     private String name;
     private String description;
+    // countdown num represents how many seconds elapse when we judge a device is disconnect whether or not
+    private int countDownNum = INVALID_DOG_FOOD;
 
-    private int dogFood = INVALID_DOG_FOOD;
-
+    /** Constructor **/
     public DeviceRecord(long senderID, String name, String description) {
         this.senderID = senderID;
         this.name = name;
@@ -22,9 +25,35 @@ public class DeviceRecord{
         this.senderID = senderID;
         this.name = name;
         this.description = description;
-        dogFood = food;
+        countDownNum = food;
     }
 
+    /** Methods **/
+    /**
+     * If countdown is larger than 0, we regard this device as alive
+     * @return true if countDownNun > 0
+     */
+    public boolean isAlive(){
+        if(countDownNum > 0){
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Override toString() method for displaying easily in MaintainanceMonitor
+     * @return
+     */
+    @Override
+    public String toString() {
+        if(countDownNum <= 0){
+            return name + " : " + description + "     no responding";
+        }else{
+            return name + " : " + description;
+        }
+    }
+
+    /** Getter and Setter **/
     public long getSenderID() {
         return senderID;
     }
@@ -49,27 +78,12 @@ public class DeviceRecord{
         this.description = description;
     }
 
-    public int getDogFood() {
-        return dogFood;
+    public int getCountDownNum() {
+        return countDownNum;
     }
 
-    public void setDogFood(int dogFood) {
-        this.dogFood = dogFood;
+    public void setCountDownNum(int countDownNum) {
+        this.countDownNum = countDownNum;
     }
 
-    public boolean isAlive(){
-        if(dogFood > 0){
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    public String toString() {
-        if(dogFood <= 0){
-            return name + " : " + description + "     no responding";
-        }else{
-            return name + " : " + description;
-        }
-    }
 }
