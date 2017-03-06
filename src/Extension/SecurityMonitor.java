@@ -136,8 +136,10 @@ public class SecurityMonitor extends MaintainableDevice implements Runnable {
 
         try
         {
+            doorIndicator.dispose();
+            windowIndicator.dispose();
+            movementIndicator.dispose();
             messageInterface.SendMessage( msg );
-
         } // try
 
         catch (Exception e)
