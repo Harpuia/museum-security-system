@@ -114,7 +114,6 @@ public class FireMonitor implements Runnable {
             while (!shutdown) {
                 readMsg();
                 if (dataFromSensor.get(FIRE_MSGID) != null) {
-                    msgWin.WriteMessage("Enters controlFire");
                     controlFire();
                 } else if (dataFromSensor.get(HALT_MSGID) != null) {
                     try {
