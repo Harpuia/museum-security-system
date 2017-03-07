@@ -68,17 +68,6 @@ public class FireMonitor implements Runnable {
         return(registered);
     }
 
-    public void halt () {
-        msgWin.WriteMessage( "***HALT MESSAGE RECEIVED - SHUTTING DOWN SYSTEM***" );
-        Message msg = new Message (HALT_MSGID, "XXX" );
-
-        try {
-            msgMgrInterface.SendMessage (msg);
-        } catch (Exception e) {
-            System.out.println("Error sending halt message:: " + e);
-        }
-    }
-
     public void readMsg () {
         MessageQueue msgQueue = null;
         try {
