@@ -96,8 +96,7 @@ class TemperatureSensor
 
 		if (em != null)
 		{
-			MaintenanceUtils.SendAliveSignal("TemperatureSensor","Hi, I'm the temperature sensor",em);
-
+			MaintenanceUtils.SendAliveSignal(">> Temperature Sensor",">> Initial system temperature sensor",em);
 			// We create a message window. Note that we place this panel about 1/2 across
 			// and 1/3 down the screen
 
