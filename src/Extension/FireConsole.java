@@ -8,11 +8,11 @@ import java.io.InputStreamReader;
 /**
  * Created by Yuchao on 03/03/2017.
  */
-public class SecurityConsole extends Thread {
+public class FireConsole extends Thread {
     private final String LOOPBACK_IP = "127.0.0.1";
     private String msgMgrIP;
     private Termio userInput = new Termio();
-    private SecurityState state;
+    private FireState state;
     private BufferedReader myReader =
             new BufferedReader(new InputStreamReader(System.in));
     volatile boolean shutdown = false;
@@ -26,7 +26,7 @@ public class SecurityConsole extends Thread {
         return myReader;
     }
 
-    public SecurityConsole (String msgMgrIP, SecurityState state) {
+    public FireConsole(String msgMgrIP, FireState state) {
         this.msgMgrIP = msgMgrIP;
         this.state = state;
     }
@@ -53,11 +53,17 @@ public class SecurityConsole extends Thread {
                 }
                 System.out.println("X: Stop system");
                 System.out.print("\n>>>> ");
-            } else {
-                SecurityConsoleLauncher.clearScreen();
+            } else if (!state.getSprinklerOn()) {
+                FireConsoleLauncher.clearScreen();
                 System.out.println("***FIRE ALARM RECEIVED - TURNING ON THE SPRINKLER in 10 secs...***");
                 System.out.println("Press any key to confirm, or press Z to cancel");
-                System.out.print( "\n>>>> " );
+                System.out.print("\n>>>> ");
+            } else {
+                FireConsoleLauncher.clearScreen();
+                System.out.println("***FIRE ALARM RECEIVED AND THE SPRINKLER IS ALREADY ON...");
+                System.out.println("If no directions received in 10 seconds, the sprinkler will remain on");
+                System.out.println("Press any key to continue, or press Z to cancel:");
+                System.out.print("\n>>>> ");
             }
 
 
@@ -110,6 +116,7 @@ public class SecurityConsole extends Thread {
             else {
                 if (option.equals("Z")) {
                     state.setHasAlarm(false);
+                    state.setSprinklerOn(false);
                     System.out.println("Sprinkler turning on has been cancelled. Fire alarm is stopped.");
                     System.out.println("Press enter to return to the main menu.");
                 } else {
@@ -123,7 +130,7 @@ public class SecurityConsole extends Thread {
 
             try {
                 myReader.readLine();
-                SecurityConsoleLauncher.clearScreen();
+                FireConsoleLauncher.clearScreen();
             } catch (IOException e) {
                 e.printStackTrace();
             }

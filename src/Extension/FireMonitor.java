@@ -8,22 +8,22 @@ import static java.lang.Thread.sleep;
 /**
  * Created by yazid on 03-Mar-17.
  */
-public class SecurityMonitor extends BaseMonitor {
+public class FireMonitor extends BaseMonitor {
     private final int FIRE_MSGID = 6;
     private final int SPRINKLER_MSGID = 7;
     private final int delay = 1000;
-    private SecurityState state;
+    private FireState state;
     //Monitor can call all console's public methods
     //Console can call all monitor's public methods
 
 
-    public SecurityMonitor (SecurityState state) {
+    public FireMonitor(FireState state) {
         super();
         this.state = state;
         dataFromSensor.put (FIRE_MSGID, null);
     }
 
-    public SecurityMonitor (String msgIpAddress, SecurityState state) {
+    public FireMonitor(String msgIpAddress, FireState state) {
         super(msgIpAddress);
         this.state = state;
         dataFromSensor.put (FIRE_MSGID, null);

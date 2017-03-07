@@ -1,38 +1,34 @@
 package Extension;
 
-import TermioPackage.Termio;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-
 import static java.lang.Thread.sleep;
 
 /**
  * Created by Yuchao on 03-Mar-17.
  */
-public class SecurityConsoleLauncher extends MaintainableDevice {
+public class FireConsoleLauncher extends MaintainableDevice {
     private final String LOOPBACK_IP = "127.0.0.1";
     private final int SLEEP_MILLISECONDS = 200;
+    private int dogFood;
     private BaseMonitor monitor;
-    private SecurityConsole console;
-    private SecurityState state = new SecurityState();
+    private FireConsole console;
+    private FireState state = new FireState();
+
     //private Termio userInput = new Termio();
 
 
     private BaseMonitor constructMonitor(String[] args) {
         if (args.length != 0) {
-            return new SecurityMonitor(args[0], state);
+            return new FireMonitor(args[0], state);
         } else {
-            return new SecurityMonitor(state);
+            return new FireMonitor(state);
         }
     }
 
-    private SecurityConsole constructConsole(String[] args) {
+    private FireConsole constructConsole(String[] args) {
         if (args.length != 0) {
-            return new SecurityConsole(args[0], state);
+            return new FireConsole(args[0], state);
         } else {
-            return new SecurityConsole(LOOPBACK_IP, state);
+            return new FireConsole(LOOPBACK_IP, state);
         }
     }
 
@@ -59,13 +55,11 @@ public class SecurityConsoleLauncher extends MaintainableDevice {
         }
     }
 
-    private void listenToAlarm(boolean hasAlarm, int dogFood) {
-        int count = dogFood / SLEEP_MILLISECONDS;
+    private void listenToAlarmInTenSec(boolean hasAlarm) {
         try {
-            int i = 0;
-            while ((state.getHasAlarm() == hasAlarm) && i < count) {
+            while ((state.getHasAlarm() == hasAlarm) && dogFood > 0) {
                 sleep(SLEEP_MILLISECONDS);
-                i++;
+                dogFood -= SLEEP_MILLISECONDS;
             }
         } catch (InterruptedException e) {
             System.out.println("The console has been ended...");
@@ -115,10 +109,9 @@ public class SecurityConsoleLauncher extends MaintainableDevice {
     private void launch (String[] args) {
         monitor = constructMonitor(args);
         console = constructConsole(args);
+        dogFood = 10000;
 
         if (monitor.isRegistered()) {
-            //monitor.run();
-            //console.run();
             new Thread(monitor).start();
             console.start();
 
@@ -126,13 +119,20 @@ public class SecurityConsoleLauncher extends MaintainableDevice {
                 listenToAlarm(false);
 
                 if (state.getHasAlarm()) {
-                    //handleAlarm();
                     console.shutdown();
-                    //console.interrupt();
                     console = constructConsole(args);
                     console.start();
                 }
-                listenToAlarm(true, 10000);
+                listenToAlarmInTenSec(true);
+                if (dogFood <= 0) {
+                    state.setSprinklerOn(true);
+                    state.setHasAlarm(false);
+                    System.out.println("Sprinkler has successfully been turned on, and the fire alarm is closed.");
+                    System.out.println("Press enter to return to the main menu.");
+                    console.shutdown();
+                    console = constructConsole(args);
+                    console.start();
+                }
             }
 
         } else {
@@ -141,6 +141,6 @@ public class SecurityConsoleLauncher extends MaintainableDevice {
     }
 
     public static void main (String[] args) {
-        (new SecurityConsoleLauncher()).launch(args);
+        (new FireConsoleLauncher()).launch(args);
     }
 }
