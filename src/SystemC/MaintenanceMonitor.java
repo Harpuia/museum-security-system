@@ -120,7 +120,7 @@ public class MaintenanceMonitor {
                             }
                         }
                     }
-                } else if (tmpMsg.GetMessageId() == 99 ){
+                } else if (tmpMsg.GetMessageId() == 99) {
                     haltMonitor();
                     done = true;
                 }
