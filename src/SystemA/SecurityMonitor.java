@@ -175,8 +175,7 @@ public class SecurityMonitor implements Runnable {
 
         if (messageInterface != null) {
             //Sending alive message
-            MaintenanceUtils.SendAliveSignal("Security Monitor", "Security monitor and its console.", messageInterface);
-
+            MaintenanceUtils.SendAliveSignal(">> Security Monitor",">> Initial system security monitor", messageInterface);
             //Initial status display
             messageWindow.WriteMessage("Registered with the message manager.");
             try {
