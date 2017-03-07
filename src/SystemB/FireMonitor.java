@@ -1,5 +1,6 @@
 package SystemB;
 
+import Extension.MaintenanceUtils;
 import InstrumentationPackage.Indicator;
 import InstrumentationPackage.MessageWindow;
 import MessagePackage.Message;
@@ -99,6 +100,8 @@ public class FireMonitor implements Runnable {
     @Override
     public void run () {
         if (msgMgrInterface != null) {
+            //Sending alive message
+            MaintenanceUtils.SendAliveSignal("Fire Monitor", "The fire monitor.", msgMgrInterface);
             msgWin = new MessageWindow("Fire Console", 0, 0);
             msgWin.WriteMessage("Registered with the message manager.");
             fireIndicator = new Indicator("Fire Alarm OFF", msgWin.GetX(), msgWin.GetY() + msgWin.Height());

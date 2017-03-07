@@ -1,5 +1,6 @@
 package SystemB;
 
+import Extension.MaintenanceUtils;
 import MessagePackage.Message;
 import MessagePackage.MessageManagerInterface;
 import MessagePackage.MessageQueue;
@@ -41,6 +42,8 @@ public class FireDetectorSimulator {
         }
 
         if(msgMgrInterface != null) {
+            //Sending alive message
+            MaintenanceUtils.SendAliveSignal("Fire Detector Simulator", "The fire detector simulator.", msgMgrInterface);
             while (true) {
                 try {
                     System.out.println("Enter 1 to simulate a fire event:");

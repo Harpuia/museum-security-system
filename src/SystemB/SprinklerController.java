@@ -1,5 +1,6 @@
 package SystemB;
 
+import Extension.MaintenanceUtils;
 import InstrumentationPackage.Indicator;
 import InstrumentationPackage.MessageWindow;
 import MessagePackage.Message;
@@ -40,6 +41,8 @@ public class SprinklerController {
         }
 
         if (msgMgrInterface != null) {
+            //Sending alive message
+            MaintenanceUtils.SendAliveSignal("Sprinkler Controller", "The fire sprinkler controller.", msgMgrInterface);
             System.out.println("Registered with the message manager.");
             float WinPosX = 0.0f;
             float WinPosY = 0.9f;
