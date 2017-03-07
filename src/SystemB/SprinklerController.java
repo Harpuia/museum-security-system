@@ -42,7 +42,7 @@ public class SprinklerController {
 
         if (messageManagerInterface != null) {
             //Sending alive message
-            MaintenanceUtils.SendAliveSignal("Sprinkler Controller", "The fire sprinkler controller.", messageManagerInterface);
+            MaintenanceUtils.SendAliveSignal(">> Sprinkler Controller",">> Initial system sprinkler controller", messageManagerInterface);
             System.out.println("Registered with the message manager.");
             float WinPosX = 0;
             float WinPosY = 0;
