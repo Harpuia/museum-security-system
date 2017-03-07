@@ -19,22 +19,21 @@ public class FireMonitor implements Runnable {
     private final int SPRINKLER_MSGID = 7;
     private final int HALT_MSGID = 99;
     private final int delay = 500;
-    private MessageManagerInterface msgMgrInterface;
+    private MessageManagerInterface messageManagerInterface;
     private String msgMgrIP;
     private boolean registered = true;
-    private MessageWindow msgWin;
+    private MessageWindow messageWindow;
     private HashMap<Integer, Message> dataFromSensor = new HashMap<>();
     private FireState state;
     private boolean shutdown = false;
     private Indicator fireIndicator;
 
-
     public void shutdown() {
-        msgWin.WriteMessage("***HALT MESSAGE RECEIVED - SHUTTING DOWN SYSTEM***");
+        messageWindow.WriteMessage("***HALT MESSAGE RECEIVED - SHUTTING DOWN SYSTEM***");
         Message msg = new Message(HALT_MSGID, "XXX");
         try {
-            msgMgrInterface.SendMessage(msg);
-        } catch(Exception e) {
+            messageManagerInterface.SendMessage(msg);
+        } catch (Exception e) {
             System.out.println("Error sending halt message:: " + e);
         }
         this.shutdown = true;
@@ -42,125 +41,127 @@ public class FireMonitor implements Runnable {
 
     public FireMonitor(FireState state) {
         try {
-            msgMgrInterface = new MessageManagerInterface();
+            messageManagerInterface = new MessageManagerInterface();
         } catch (Exception e) {
             System.out.println("ECSMonitor::Error instantiating message manager interface: " + e);
             registered = false;
         }
 
         this.state = state;
-        dataFromSensor.put (HALT_MSGID, null);
-        dataFromSensor.put (FIRE_MSGID, null);
+        dataFromSensor.put(HALT_MSGID, null);
+        dataFromSensor.put(FIRE_MSGID, null);
     }
 
     public FireMonitor(String msgIpAddress, FireState state) {
         msgMgrIP = msgIpAddress;
         try {
-            msgMgrInterface = new MessageManagerInterface (msgMgrIP);
+            messageManagerInterface = new MessageManagerInterface(msgMgrIP);
         } catch (Exception e) {
             System.out.println("ECSMonitor::Error instantiating message manager interface: " + e);
             registered = false;
         }
 
         this.state = state;
-        dataFromSensor.put (HALT_MSGID, null);
-        dataFromSensor.put (FIRE_MSGID, null);
+        dataFromSensor.put(HALT_MSGID, null);
+        dataFromSensor.put(FIRE_MSGID, null);
     }
 
-    public boolean isRegistered () {
-        return(registered);
+    public boolean isRegistered() {
+        return (registered);
     }
 
-    public void readMsg () {
-        MessageQueue msgQueue = null;
+    public void readMessage() {
+        MessageQueue messageQueue = null;
         try {
-            msgQueue = msgMgrInterface.GetMessageQueue();
+            messageQueue = messageManagerInterface.GetMessageQueue();
         } catch (Exception e) {
-            msgWin.WriteMessage ("Error getting message queue::" + e);
+            messageWindow.WriteMessage("Error getting message queue::" + e);
         }
 
-        int queueLength = msgQueue.GetSize();
+        int queueLength = messageQueue.GetSize();
         for (int i = 0; i < queueLength; i++) {
-            Message msg = msgQueue.GetMessage();
-            int msgId = msg.GetMessageId();
-            if (dataFromSensor.containsKey(msgId)) {
-                dataFromSensor.put(msgId, msg);
+            Message message = messageQueue.GetMessage();
+            int messageId = message.GetMessageId();
+            if (dataFromSensor.containsKey(messageId)) {
+                dataFromSensor.put(messageId, message);
             }
         }
     }
 
-    public void controlFire () {
+    public void controlFire() {
         Message msg = dataFromSensor.get(FIRE_MSGID);
         String fireMsgTxt = msg.GetMessage();
-        msgWin.WriteMessage(fireMsgTxt);
+        messageWindow.WriteMessage(fireMsgTxt);
         state.setHasAlarm(true);
         fireIndicator.SetLampColorAndMessage("FIRE ALARM ON", 3);
     }
 
     @Override
-    public void run () {
-        if (msgMgrInterface != null) {
+    public void run() {
+        if (messageManagerInterface != null) {
             //Sending alive message
-            MaintenanceUtils.SendAliveSignal("Fire Monitor", "The fire monitor.", msgMgrInterface);
-            msgWin = new MessageWindow("Fire Console", 0, 0);
-            msgWin.WriteMessage("Registered with the message manager.");
-            fireIndicator = new Indicator("Fire Alarm OFF", msgWin.GetX(), msgWin.GetY() + msgWin.Height());
-
+            MaintenanceUtils.SendAliveSignal("Fire Monitor", "The fire monitor.", messageManagerInterface);
+            messageWindow = new MessageWindow("Fire Console", 0, 0);
+            messageWindow.WriteMessage("Registered with the message manager.");
+            fireIndicator = new Indicator("Fire Alarm OFF", 0, 0);
 
             try {
-                msgWin.WriteMessage("   Participant id: " + msgMgrInterface.GetMyId());
-                msgWin.WriteMessage("   Registration Time: " + msgMgrInterface.GetRegistrationTime());
+                messageWindow.WriteMessage("   Participant id: " + messageManagerInterface.GetMyId());
+                messageWindow.WriteMessage("   Registration Time: " + messageManagerInterface.GetRegistrationTime());
             } catch (Exception e) {
                 System.out.println("Error:: " + e);
             }
 
             while (!shutdown) {
-                readMsg();
+                readMessage();
                 if (dataFromSensor.get(FIRE_MSGID) != null) {
                     controlFire();
                 } else if (dataFromSensor.get(HALT_MSGID) != null) {
                     try {
-                        msgMgrInterface.UnRegister();
+                        messageManagerInterface.UnRegister();
                     } catch (Exception e) {
-                        msgWin.WriteMessage("Error unregistering: " + e);
+                        messageWindow.WriteMessage("Error unregistering: " + e);
                     }
 
-                    msgWin.WriteMessage("\n\nSimulation stopped.\n");
+                    messageWindow.WriteMessage("\n\nSimulation stopped.\n");
                     fireIndicator.dispose();
                     break;
                 }
-
-                if(!state.getHasAlarm()) {
+                if (!state.getHasAlarm()) {
                     fireIndicator.SetLampColorAndMessage("FIRE ALARM OFF", 1);
                 }
-
-                dataFromSensor.put(FIRE_MSGID, null);
-
-                if(state.getSprinklerOn()) {
-                    Message msgToSend = new Message(SPRINKLER_MSGID, "S1");
-                    try {
-                        msgMgrInterface.SendMessage(msgToSend);
-                    } catch (Exception e) {
-                        System.out.println("Error sending sprinkler control message:: " + e);
-                    }
-                } else {
-                    Message msgToSend = new Message(SPRINKLER_MSGID, "S0");
-                    try {
-                        msgMgrInterface.SendMessage(msgToSend);
-                    } catch (Exception e) {
-                        System.out.println("Error sending sprinkler control message::" + e);
-                    }
+                if (state.sprinklerChanged) {
+                    this.sendCommandToSprinklerController();
+                    state.sprinklerChanged = false;
                 }
-
+                dataFromSensor.put(FIRE_MSGID, null);
                 try {
-                    sleep (delay);
+                    sleep(delay);
                 } catch (InterruptedException e) {
-                    System.out.println ("Error::" + e);
+                    System.out.println("Error::" + e);
                 }
             }
         } else {
-            System.out.println ("Unable to register with the message manager.");
+            System.out.println("Unable to register with the message manager.");
         }
 
+    }
+
+    public void sendCommandToSprinklerController() {
+        if (state.getSprinklerOn()) {
+            Message msgToSend = new Message(SPRINKLER_MSGID, "S1");
+            try {
+                messageManagerInterface.SendMessage(msgToSend);
+            } catch (Exception e) {
+                System.out.println("Error sending sprinkler control message:: " + e);
+            }
+        } else {
+            Message msgToSend = new Message(SPRINKLER_MSGID, "S0");
+            try {
+                messageManagerInterface.SendMessage(msgToSend);
+            } catch (Exception e) {
+                System.out.println("Error sending sprinkler control message::" + e);
+            }
+        }
     }
 }

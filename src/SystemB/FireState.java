@@ -7,7 +7,7 @@ public class FireState {
     private boolean hasAlarm;
     private boolean sprinklerOn;
     private boolean isStop;
-
+    public boolean sprinklerChanged = false;
 
     public FireState() {
         hasAlarm = false;
@@ -33,6 +33,7 @@ public class FireState {
 
     public synchronized void setSprinklerOn(boolean sprinklerOn) {
         this.sprinklerOn = sprinklerOn;
+        sprinklerChanged = true;
     }
 
     public synchronized void setIsStop(boolean stop) {

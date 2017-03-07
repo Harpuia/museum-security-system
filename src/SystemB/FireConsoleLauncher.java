@@ -94,9 +94,6 @@ public class FireConsoleLauncher{
              */
             while ((state.getHasAlarm()) && (System.currentTimeMillis() - lastFireDetected) <= 10000) {
                 sleep(SLEEP_MILLISECONDS);
-
-                /** countDown is used here to determine timeout. */
-                //countDown -= SLEEP_MILLISECONDS;
             }
         } catch (InterruptedException e) {
             System.out.println("The console has been ended...");
@@ -161,6 +158,7 @@ public class FireConsoleLauncher{
                 if (state.getHasAlarm()) {
                     /** Note: when the sprinkler is on, the system automatically turns off the alarm.*/
                     state.setSprinklerOn(true);
+                    monitor.sendCommandToSprinklerController();
                     state.setHasAlarm(false);
 
                     System.out.println("Sprinkler has successfully been turned on, and the fire alarm is closed.");

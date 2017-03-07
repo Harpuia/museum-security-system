@@ -14,19 +14,19 @@ public class SprinklerController {
     public static void main (String args[]) {
         final int SPRINKLER_MSGID = 7;
         final int HALT_MSGID = 99;
-        final int DELAY = 2500;
+        final int DELAY = 500;
 
         int queueLength;
         String msgMgrIP;
-        Message msg = null;
-        MessageQueue msgQueue = null;
-        MessageManagerInterface msgMgrInterface = null;
+        Message message = null;
+        MessageQueue messageQueue = null;
+        MessageManagerInterface messageManagerInterface = null;
         boolean sprinklerState = false;
 
         if (args.length == 0) {
             System.out.println("Attempting to register on the local machine...");
             try {
-                msgMgrInterface = new MessageManagerInterface();
+                messageManagerInterface = new MessageManagerInterface();
             } catch (Exception e) {
                 System.out.println("Error instantiating message manager interface: " + e);
             }
@@ -34,59 +34,58 @@ public class SprinklerController {
             msgMgrIP = args[0];
             System.out.println("Attempting to register on the machine:: " + msgMgrIP);
             try {
-                msgMgrInterface = new MessageManagerInterface(msgMgrIP);
+                messageManagerInterface = new MessageManagerInterface(msgMgrIP);
             } catch (Exception e) {
                 System.out.println("Error instantiating message manager interface: " + e);
             }
         }
 
-        if (msgMgrInterface != null) {
+        if (messageManagerInterface != null) {
             //Sending alive message
-            MaintenanceUtils.SendAliveSignal("Sprinkler Controller", "The fire sprinkler controller.", msgMgrInterface);
+            MaintenanceUtils.SendAliveSignal("Sprinkler Controller", "The fire sprinkler controller.", messageManagerInterface);
             System.out.println("Registered with the message manager.");
-            float WinPosX = 0.0f;
-            float WinPosY = 0.9f;
-            MessageWindow msgWin = new MessageWindow("Sprinkler Controller Status Console", WinPosX, WinPosY);
-            Indicator sprinklerIndicator = new Indicator("Sprinkler OFF", msgWin.GetX(), msgWin.GetY() + msgWin.Height());
-            msgWin.WriteMessage("Registered with the message manager.");
+            float WinPosX = 0;
+            float WinPosY = 0;
+            MessageWindow messageWindow = new MessageWindow("Sprinkler Controller Status Console", WinPosX, WinPosY);
+            Indicator sprinklerIndicator = new Indicator("Sprinkler OFF", WinPosX, WinPosY + messageWindow.Height());
+            messageWindow.WriteMessage("Registered with the message manager.");
             try {
-                msgWin.WriteMessage("Participant id: " + msgMgrInterface.GetMyId());
-                msgWin.WriteMessage("Registration Time: " + msgMgrInterface.GetRegistrationTime());
+                messageWindow.WriteMessage("Participant id: " + messageManagerInterface.GetMyId());
+                messageWindow.WriteMessage("Registration Time: " + messageManagerInterface.GetRegistrationTime());
             } catch (Exception e) {
                 System.out.println("Error:: " + e);
             }
 
             while(true) {
                 try {
-                    msgQueue = msgMgrInterface.GetMessageQueue();
+                    messageQueue = messageManagerInterface.GetMessageQueue();
                 } catch (Exception e) {
-                    msgWin.WriteMessage("Error getting message queue::" + e);
+                    messageWindow.WriteMessage("Error getting message queue::" + e);
                 }
 
-                if(msgQueue == null) {
+                if(messageQueue == null) {
                     System.exit(0);
                 }
 
-                queueLength = msgQueue.GetSize();
+                queueLength = messageQueue.GetSize();
                 for (int i = 0; i < queueLength; i++) {
-                    msg = msgQueue.GetMessage();
-                    if (msg.GetMessageId() == SPRINKLER_MSGID) {
-                        if (msg.GetMessage().equalsIgnoreCase("S1")) {
+                    message = messageQueue.GetMessage();
+                    if (message.GetMessageId() == SPRINKLER_MSGID) {
+                        if (message.GetMessage().equalsIgnoreCase("S1")) {
                             sprinklerState = true;
-                            msgWin.WriteMessage("Received sprinkler on message");
-                            // Conform message
-                        } else if (msg.GetMessage().equalsIgnoreCase("S0")) {
+                            messageWindow.WriteMessage("Received sprinkler on message");
+                            // Confirm message
+                        } else if (message.GetMessage().equalsIgnoreCase("S0")) {
                             sprinklerState = false;
-                            msgWin.WriteMessage("Received sprinkler off message");
+                            messageWindow.WriteMessage("Received sprinkler off message");
                         }
-                    } else if (msg.GetMessageId() == HALT_MSGID) {
+                    } else if (message.GetMessageId() == HALT_MSGID) {
                         try {
-                            msgMgrInterface.UnRegister();
+                            messageManagerInterface.UnRegister();
                         } catch (Exception e) {
-                            msgWin.WriteMessage("Error unregistering: " + e);
+                            messageWindow.WriteMessage("Error unregistering: " + e);
                         }
-
-                        msgWin.WriteMessage("\n\nSimulation Stopped.\n");
+                        messageWindow.WriteMessage("\n\nSimulation Stopped.\n");
                         sprinklerIndicator.dispose();
                     }
                 }
