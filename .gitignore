@@ -45,7 +45,8 @@ crashlytics-build.properties
 fabric.properties
 ### Java template
 # Compiled class file
-*.class
+/out/*.class
+
 
 # Log file
 *.log
@@ -68,3 +69,4 @@ fabric.properties
 hs_err_pid*
 !/out/production/ArchitectureAssignmentsCMU-A2/ECStart.sh
 !/out/production/ArchitectureAssignmentsCMU-A2/EMStart.sh
+!/scripts-a2/
