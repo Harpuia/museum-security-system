@@ -99,7 +99,7 @@ class HumiditySensor
 		{
 			//HumiditySensor hs=new HumiditySensor();
 
-			MaintenanceUtils.SendAliveSignal("HumiditySensor", "Hi, I'm the humidity sensor", em);
+			MaintenanceUtils.SendAliveSignal(">> Humidity Sensor",">> Initial system humidity sensor", em);
 			// We create a message window. Note that we place this panel about 1/2 across
 			// and 2/3s down the screen
 
