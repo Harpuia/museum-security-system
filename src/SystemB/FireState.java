@@ -1,4 +1,4 @@
-package Extension;
+package SystemB;
 
 /**
  * Created by Yuchao on 04/03/2017.
@@ -9,18 +9,12 @@ public class FireState {
     private boolean sprinklerOn;
     private boolean isStop;
 
+
     public FireState() {
         hasAlarm = false;
         isArmed = false;
         sprinklerOn = false;
         isStop = false;
-    }
-
-    public FireState(boolean hasAlarm, boolean isArmed, boolean sprinklerOn, boolean isStop) {
-        this.hasAlarm = hasAlarm;
-        this.isArmed = isArmed;
-        this.sprinklerOn = sprinklerOn;
-        this.isStop = isStop;
     }
 
     public synchronized boolean getHasAlarm() {

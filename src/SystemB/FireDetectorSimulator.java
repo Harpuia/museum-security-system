@@ -1,11 +1,10 @@
-package Extension;
+package SystemB;
 
 import MessagePackage.Message;
 import MessagePackage.MessageManagerInterface;
 import MessagePackage.MessageQueue;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 
 /**
@@ -14,11 +13,13 @@ import java.io.InputStreamReader;
 public class FireDetectorSimulator {
     public static void main (String[] args) {
         final int FIRE_MSGID = 6;
+        final int HALT_MSGID = 99;
         final int DELAY = 2500;
 
+        int queueLength;
         String msgMgrIP;
-        Message msg = null;
-        MessageQueue msgQueue = null;
+        Message msg;
+        MessageQueue msgQueue;
         MessageManagerInterface msgMgrInterface = null;
         BufferedReader myReader =
                 new BufferedReader(new InputStreamReader(System.in));
@@ -42,16 +43,34 @@ public class FireDetectorSimulator {
             }
         }
 
-        while(true) {
-            try {
-                System.out.println("Press any key to simulate a fire event:");
-                myReader.readLine();
-                msg = new Message (FIRE_MSGID, msgText);
-                msgMgrInterface.SendMessage(msg);
-            } catch (Exception e) {
-                System.out.println("Error posting fire alarm::" + e);
-                break;
+        if(msgMgrInterface != null) {
+            while (true) {
+                try {
+                    msgQueue = msgMgrInterface.GetMessageQueue();
+                    if (msgQueue == null) {
+                        System.exit(0);
+                    }
+
+                    queueLength = msgQueue.GetSize();
+                    for (int i = 0; i < queueLength; i++) {
+                        msg = msgQueue.GetMessage();
+                        if (msg.GetMessageId() == HALT_MSGID) {
+                            msgMgrInterface.UnRegister();
+                            System.out.println("\n\nSimulation Stopped.\n");
+                        }
+                    }
+                    Thread.sleep(DELAY);
+                    System.out.println("Press any key to simulate a fire event:");
+                    myReader.readLine();
+                    msg = new Message(FIRE_MSGID, msgText);
+                    msgMgrInterface.SendMessage(msg);
+                } catch (Exception e) {
+                    System.out.println("Error posting fire alarm::" + e);
+                    break;
+                }
             }
+        } else {
+            System.out.println("Unable to register with the message manager.");
         }
     }
 }

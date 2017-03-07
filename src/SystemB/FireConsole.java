@@ -1,31 +1,37 @@
-package Extension;
-import TermioPackage.*;
+package SystemB;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
 /**
- * Created by Yuchao on 03/03/2017.
+ * The console thread for user to input.
  */
 public class FireConsole extends Thread {
     private final String LOOPBACK_IP = "127.0.0.1";
     private String msgMgrIP;
-    private Termio userInput = new Termio();
+
+    /** The reference of the shared object */
     private FireState state;
+
     private BufferedReader myReader =
             new BufferedReader(new InputStreamReader(System.in));
-    volatile boolean shutdown = false;
 
+    /** Used in halting */
+    boolean shutdown = false;
 
+    /**
+     * Called from the outer "main" thread.
+     */
     public void shutdown() {
         shutdown = true;
     }
 
-    public BufferedReader getMyReader() {
-        return myReader;
-    }
-
+    /**
+     * Constructor of the fire console
+     * @param msgMgrIP ip address of message manager
+     * @param state shared state passed by the launcher
+     */
     public FireConsole(String msgMgrIP, FireState state) {
         this.msgMgrIP = msgMgrIP;
         this.state = state;
@@ -35,6 +41,8 @@ public class FireConsole extends Thread {
     public void run() {
         while (true) {
             String option = null;
+
+            /** When the fire alarm doesn't arrive, the console shows the main menu. */
             if(!state.getHasAlarm()) {
                 System.out.println("\n\n\n\n");
                 System.out.println("Security System Command Console:");
@@ -48,12 +56,22 @@ public class FireConsole extends Thread {
                 System.out.println("Select an option:");
                 System.out.println("1: Arm the system");
                 System.out.println("2: Disarm the system");
+
+                /** The user is only given control to turn off the sprinkler.
+                  * This ONLY happens when the sprinkler is on.
+                  */
                 if (state.getSprinklerOn()) {
                     System.out.println("3: Turn off the sprinkler");
                 }
                 System.out.println("X: Stop system");
                 System.out.print("\n>>>> ");
-            } else if (!state.getSprinklerOn()) {
+            }
+
+            /** This branch will only be entered in the following scenarios:
+             *  When the fire alarm arrives, and the console is destroyed and started again.
+             *  The console will show different messages depending on the sprinkler state.
+             */
+            else if (!state.getSprinklerOn()) {
                 FireConsoleLauncher.clearScreen();
                 System.out.println("***FIRE ALARM RECEIVED - TURNING ON THE SPRINKLER in 10 secs...***");
                 System.out.println("Press any key to confirm, or press Z to cancel");
@@ -68,7 +86,7 @@ public class FireConsole extends Thread {
 
 
             try {
-                // wait until we have data to complete a readLine()
+                /** wait until we have data to complete a readLine() */
                 while (!(myReader.ready() || shutdown)) {
                     Thread.sleep(200);
                 }
@@ -80,6 +98,10 @@ public class FireConsole extends Thread {
                 e.printStackTrace();
             }
 
+            /** This branch will only be entered in the following scenarios:
+             *  There is no fire alarm, and the user has input an option.
+             *  The system does the corresponding operation based on user's input.
+             */
             if (!state.getHasAlarm()) {
                 if (option.equals("1")) {
                     if (state.getIsArmed()) {
@@ -99,12 +121,18 @@ public class FireConsole extends Thread {
                                 "Security intrusions will NOT be reported to the user.");
                         System.out.println("Press enter to return to the menu.");
                     }
-                } else if (option.equals("3") && state.getSprinklerOn()) {
+                }
+
+                /** Note: The sprinkler can only be altered when it is on. */
+                else if (option.equals("3") && state.getSprinklerOn()) {
                     state.setSprinklerOn(false);
                     System.out.println("Sprinkler has successfully been turned off.");
                     System.out.println("Press enter to return to the menu.");
-                } else if (option.equals("X")) {
-                    // TODO: Halt
+                }
+
+                /** Sending halt */
+                else if (option.equalsIgnoreCase("X")) {
+                    state.setIsStop(true);
                     System.out.println("\nConsole stopped... Exit monitor window to return to command prompt.");
                     break;
                 } else {
@@ -112,16 +140,26 @@ public class FireConsole extends Thread {
                 }
             }
 
-
+            /** This branch will only be entered in the following scenarios:
+             *  The fire alarm arrived
+             *  The console restarted
+             *  The user inputs his/her options
+             */
             else {
                 if (option.equals("Z")) {
+                    /** Note: If the user CANCELS the alarm manually,
+                     *  the alarm will be turned off.
+                     */
                     state.setHasAlarm(false);
                     state.setSprinklerOn(false);
+
                     System.out.println("Sprinkler turning on has been cancelled. Fire alarm is stopped.");
                     System.out.println("Press enter to return to the main menu.");
                 } else {
+                    /** Note: When the sprinkler is on, the alarm is automatically turned off*/
                     state.setSprinklerOn(true);
                     state.setHasAlarm(false);
+
                     System.out.println("Sprinkler has successfully been turned on, and the fire alarm is closed.");
                     System.out.println("Press enter to return to the main menu.");
                 }
@@ -129,6 +167,7 @@ public class FireConsole extends Thread {
 
 
             try {
+                /** We add an enter between the switching of two menus. */
                 myReader.readLine();
                 FireConsoleLauncher.clearScreen();
             } catch (IOException e) {

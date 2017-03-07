@@ -1,4 +1,4 @@
-package Extension;
+package SystemB;
 
 import MessagePackage.Message;
 import MessagePackage.MessageManagerInterface;

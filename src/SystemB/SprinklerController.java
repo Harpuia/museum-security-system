@@ -1,4 +1,4 @@
-package Extension;
+package SystemB;
 
 import InstrumentationPackage.Indicator;
 import InstrumentationPackage.MessageWindow;
@@ -12,8 +12,10 @@ import MessagePackage.MessageQueue;
 public class SprinklerController {
     public static void main (String args[]) {
         final int SPRINKLER_MSGID = 7;
+        final int HALT_MSGID = 99;
         final int DELAY = 2500;
 
+        int queueLength;
         String msgMgrIP;
         Message msg = null;
         MessageQueue msgQueue = null;
@@ -57,7 +59,12 @@ public class SprinklerController {
                 } catch (Exception e) {
                     msgWin.WriteMessage("Error getting message queue::" + e);
                 }
-                int queueLength = msgQueue.GetSize();
+
+                if(msgQueue == null) {
+                    System.exit(0);
+                }
+
+                queueLength = msgQueue.GetSize();
                 for (int i = 0; i < queueLength; i++) {
                     msg = msgQueue.GetMessage();
                     if (msg.GetMessageId() == SPRINKLER_MSGID) {
@@ -69,7 +76,7 @@ public class SprinklerController {
                             sprinklerState = false;
                             msgWin.WriteMessage("Received sprinkler off message");
                         }
-                    } else if (msg.GetMessageId() == 99) {
+                    } else if (msg.GetMessageId() == HALT_MSGID) {
                         try {
                             msgMgrInterface.UnRegister();
                         } catch (Exception e) {

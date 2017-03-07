@@ -1,36 +1,100 @@
-package Extension;
+package SystemB;
 
 import InstrumentationPackage.MessageWindow;
 import MessagePackage.Message;
+import MessagePackage.MessageManagerInterface;
+import MessagePackage.MessageQueue;
+
+import java.util.HashMap;
 
 import static java.lang.Thread.sleep;
 
 /**
  * Created by yazid on 03-Mar-17.
  */
-public class FireMonitor extends BaseMonitor {
+public class FireMonitor implements Runnable {
     private final int FIRE_MSGID = 6;
     private final int SPRINKLER_MSGID = 7;
+    private final int HALT_MSGID = 99;
     private final int delay = 1000;
+    private MessageManagerInterface msgMgrInterface;
+    private String msgMgrIP;
+    private boolean registered = true;
+    private MessageWindow msgWin;
+    private HashMap<Integer, Message> dataFromSensor = new HashMap<>();
     private FireState state;
-    //Monitor can call all console's public methods
-    //Console can call all monitor's public methods
+    private boolean shutdown = false;
 
+
+    public void shutdown() {
+        msgWin.WriteMessage("***HALT MESSAGE RECEIVED - SHUTTING DOWN SYSTEM***");
+        Message msg = new Message(HALT_MSGID, "XXX");
+        try {
+            msgMgrInterface.SendMessage(msg);
+        } catch(Exception e) {
+            System.out.println("Error sending halt message:: " + e);
+        }
+        this.shutdown = true;
+    }
 
     public FireMonitor(FireState state) {
-        super();
+        try {
+            msgMgrInterface = new MessageManagerInterface();
+        } catch (Exception e) {
+            System.out.println("ECSMonitor::Error instantiating message manager interface: " + e);
+            registered = false;
+        }
+
         this.state = state;
+        dataFromSensor.put (HALT_MSGID, null);
         dataFromSensor.put (FIRE_MSGID, null);
     }
 
     public FireMonitor(String msgIpAddress, FireState state) {
-        super(msgIpAddress);
+        msgMgrIP = msgIpAddress;
+        try {
+            msgMgrInterface = new MessageManagerInterface (msgMgrIP);
+        } catch (Exception e) {
+            System.out.println("ECSMonitor::Error instantiating message manager interface: " + e);
+            registered = false;
+        }
+
         this.state = state;
+        dataFromSensor.put (HALT_MSGID, null);
         dataFromSensor.put (FIRE_MSGID, null);
     }
 
-    public void controlIntrusion () {
+    public boolean isRegistered () {
+        return(registered);
+    }
 
+    public void halt () {
+        msgWin.WriteMessage( "***HALT MESSAGE RECEIVED - SHUTTING DOWN SYSTEM***" );
+        Message msg = new Message (HALT_MSGID, "XXX" );
+
+        try {
+            msgMgrInterface.SendMessage (msg);
+        } catch (Exception e) {
+            System.out.println("Error sending halt message:: " + e);
+        }
+    }
+
+    public void readMsg () {
+        MessageQueue msgQueue = null;
+        try {
+            msgQueue = msgMgrInterface.GetMessageQueue();
+        } catch (Exception e) {
+            msgWin.WriteMessage ("Error getting message queue::" + e);
+        }
+
+        int queueLength = msgQueue.GetSize();
+        for (int i = 0; i < queueLength; i++) {
+            Message msg = msgQueue.GetMessage();
+            int msgId = msg.GetMessageId();
+            if (dataFromSensor.containsKey(msgId)) {
+                dataFromSensor.put(msgId, msg);
+            }
+        }
     }
 
     public void controlFire () {
@@ -53,12 +117,8 @@ public class FireMonitor extends BaseMonitor {
                 System.out.println("Error:: " + e);
             }
 
-            while (true) {
+            while (!shutdown) {
                 readMsg();
-                //TODO: ADD ACTION HERE
-                //controlIntrusion();
-                //controlFire();
-
                 if (dataFromSensor.get(FIRE_MSGID) != null) {
                     msgWin.WriteMessage("Enters controlFire");
                     controlFire();
@@ -91,7 +151,6 @@ public class FireMonitor extends BaseMonitor {
                     }
                 }
 
-                //state.setHasAlarm(true);
                 try {
                     sleep (delay);
                 } catch (InterruptedException e) {
