@@ -24,7 +24,7 @@
 ******************************************************************************************************************/
 import InstrumentationPackage.*;
 import MessagePackage.*;
-import Extension.MaintenanceUtils;
+import SystemC.MaintenanceUtils;
 
 class ECSMonitor extends Thread
 {

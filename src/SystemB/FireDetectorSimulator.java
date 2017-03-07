@@ -1,9 +1,8 @@
 package SystemB;
 
-import Extension.MaintenanceUtils;
+import SystemC.MaintenanceUtils;
 import MessagePackage.Message;
 import MessagePackage.MessageManagerInterface;
-import MessagePackage.MessageQueue;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;

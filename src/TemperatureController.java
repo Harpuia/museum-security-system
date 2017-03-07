@@ -28,7 +28,7 @@
 *	static private void ConfirmMessage(MessageManagerInterface ei, String m )
 *
 ******************************************************************************************************************/
-import Extension.MaintenanceUtils;
+import SystemC.MaintenanceUtils;
 import InstrumentationPackage.*;
 import MessagePackage.*;
 

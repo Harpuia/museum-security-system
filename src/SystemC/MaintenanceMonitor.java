@@ -1,4 +1,4 @@
-package Extension;
+package SystemC;
 
 import InstrumentationPackage.MessageWindow;
 import MessagePackage.Message;

@@ -28,7 +28,7 @@
 *	static private void ConfirmMessage(MessageManagerInterface ei, String m )
 *
 ******************************************************************************************************************/
-import Extension.MaintenanceUtils;
+import SystemC.MaintenanceUtils;
 import InstrumentationPackage.*;
 import MessagePackage.*;
 
@@ -99,7 +99,7 @@ class HumidityController
 
 		if (em != null)
 		{
-			MaintenanceUtils.SendAliveSignal("HumidityController","Hi, I'm the humidity controller",em);
+			MaintenanceUtils.SendAliveSignal(">> Humidity Controller",">> Initial system humidity controller",em);
 			System.out.println("Registered with the message manager." );
 
 			/* Now we create the humidity control status and message panel

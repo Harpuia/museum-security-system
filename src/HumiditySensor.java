@@ -21,7 +21,7 @@
 *   void PostHumidity(MessageManagerInterface ei, float humidity )
 *
 ******************************************************************************************************************/
-import Extension.MaintenanceUtils;
+import SystemC.MaintenanceUtils;
 import InstrumentationPackage.*;
 import MessagePackage.*;
 import java.util.*;

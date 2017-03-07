@@ -1,6 +1,6 @@
 package SystemB;
 
-import Extension.MaintenanceUtils;
+import SystemC.MaintenanceUtils;
 import InstrumentationPackage.Indicator;
 import InstrumentationPackage.MessageWindow;
 import MessagePackage.Message;

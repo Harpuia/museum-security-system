@@ -1,4 +1,4 @@
-package Extension;
+package SystemC;
 
 /*
  * class DeviceRecord
@@ -47,7 +47,7 @@ public class DeviceRecord{
     @Override
     public String toString() {
         if(countDownNum <= 0){
-            return name + " : " + description + " disconnected.";
+            return name + " : " + description + " >>>> Disconnected!";
         }else{
             return name + " : " + description;
         }

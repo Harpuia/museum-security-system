@@ -21,7 +21,7 @@
 *   void PostTemperature(MessageManagerInterface ei, float temperature )
 *
 ******************************************************************************************************************/
-import Extension.MaintenanceUtils;
+import SystemC.MaintenanceUtils;
 import InstrumentationPackage.*;
 import MessagePackage.*;
 import java.util.*;
