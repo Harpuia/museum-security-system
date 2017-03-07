@@ -84,15 +84,15 @@ public class FireConsoleLauncher extends MaintainableDevice {
 
     /**
      * Another method listening to the fire alarm being turned off in ten seconds.
+     * @param lastFireDetected Last time the system detects the fire
      */
-    private void listenToAlarmInTenSec() {
+    private void listenToAlarmInTenSec(long lastFireDetected) {
         try {
             /**
              * Specifically, this method will end when the fire alarm being turned off,
              * or the user doesn't give any response in 10 seconds.
              */
-            long startTime = System.currentTimeMillis();
-            while ((state.getHasAlarm()) && (System.currentTimeMillis() - startTime) <= 10000) {
+            while ((state.getHasAlarm()) && (System.currentTimeMillis() - lastFireDetected) <= 10000) {
                 sleep(SLEEP_MILLISECONDS);
 
                 /** countDown is used here to determine timeout. */
@@ -140,6 +140,7 @@ public class FireConsoleLauncher extends MaintainableDevice {
                 /** The system is checking if halt signal arrives between listening operations. */
                 checkHalt();
                 listenToAlarm();
+                long lastFireDetected = System.currentTimeMillis();
                 checkHalt();
 
                 /**
@@ -154,10 +155,10 @@ public class FireConsoleLauncher extends MaintainableDevice {
                 }
 
                 /** We listen user's operation for 10 seconds.*/
-                listenToAlarmInTenSec();
+                listenToAlarmInTenSec(lastFireDetected);
 
                 /** If the user doesn't respond in 10 seconds, the sprinkler is turned on.*/
-                if (countDown <= 0) {
+                if (state.getHasAlarm()) {
                     /** Note: when the sprinkler is on, the system automatically turns off the alarm.*/
                     state.setSprinklerOn(true);
                     state.setHasAlarm(false);
