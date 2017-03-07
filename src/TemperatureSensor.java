@@ -21,12 +21,12 @@
 *   void PostTemperature(MessageManagerInterface ei, float temperature )
 *
 ******************************************************************************************************************/
-import Extension.MaintainableDevice;
+import Extension.MaintenanceUtils;
 import InstrumentationPackage.*;
 import MessagePackage.*;
 import java.util.*;
 
-class TemperatureSensor extends MaintainableDevice
+class TemperatureSensor
 {
 	public static void main(String args[])
 	{
@@ -96,7 +96,7 @@ class TemperatureSensor extends MaintainableDevice
 
 		if (em != null)
 		{
-			SendAliveSignal("TemperatureSensor","Hi, I'm the temperature sensor",em);
+			MaintenanceUtils.SendAliveSignal("TemperatureSensor","Hi, I'm the temperature sensor",em);
 
 			// We create a message window. Note that we place this panel about 1/2 across
 			// and 1/3 down the screen

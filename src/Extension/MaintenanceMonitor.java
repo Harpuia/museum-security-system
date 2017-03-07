@@ -13,25 +13,29 @@ import java.util.List;
  * sensor, monitor(except for Maintenance Monitor) and controller
  */
 public class MaintenanceMonitor extends Thread {
-    /** Member Variables **/
+    /**
+     * Member Variables
+     **/
     boolean isRegistered = true;    // show if the maintenance has registered to message manager
     MessageWindow messageWindow = null; // convey the output of the monitor
     private MessageManagerInterface msgManagerIF = null;     // message manager interface
     private String msgMgrIP = null; // remote message manager IP address    // if message manager is remote, we store its IP address
     private WatchDogTimerUtil watchDogTimerUtil;
 
-    /** Constructor **/
+    /**
+     * Constructor
+     **/
     public MaintenanceMonitor() {
         try {
             msgManagerIF = new MessageManagerInterface();
             messageWindow = new MessageWindow("MaintenanceMonitor", 10, 20);
-            watchDogTimerUtil =new WatchDogTimerUtil();
+            watchDogTimerUtil = new WatchDogTimerUtil();
         } catch (Exception e) {
             System.out.println("ECSMonitor::Error instantiating message manager interface: " + e);
             isRegistered = false;
         }
-
     }
+
     public MaintenanceMonitor(String MsgIpAddress) {
         // message manager is not on the local system
         msgMgrIP = MsgIpAddress;
@@ -111,14 +115,13 @@ public class MaintenanceMonitor extends Thread {
         }
 
     }
+
     // TODO: Add parsing the args for connecting remote message manager -> Huang Xin
-    public static void main(String [] args) {
-        if(args[0].length()!=0) {
+    public static void main(String[] args) {
+        if (args[0].length() != 0) {
             MaintenanceMonitor maintenMonitor = new MaintenanceMonitor(args[0]);
             maintenMonitor.start();
-        }
-        else
-        {
+        } else {
             MaintenanceMonitor maintenMonitor = new MaintenanceMonitor();
             maintenMonitor.start();
         }

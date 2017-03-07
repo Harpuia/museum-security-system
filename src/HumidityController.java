@@ -28,12 +28,11 @@
 *	static private void ConfirmMessage(MessageManagerInterface ei, String m )
 *
 ******************************************************************************************************************/
-import Extension.MaintainableDevice;
+import Extension.MaintenanceUtils;
 import InstrumentationPackage.*;
 import MessagePackage.*;
-import java.util.*;
 
-class HumidityController extends MaintainableDevice
+class HumidityController
 {
 	public static void main(String args[])
 	{
@@ -100,7 +99,7 @@ class HumidityController extends MaintainableDevice
 
 		if (em != null)
 		{
-			SendAliveSignal("HumidityController","Hi, I'm the humidity controller",em);
+			MaintenanceUtils.SendAliveSignal("HumidityController","Hi, I'm the humidity controller",em);
 			System.out.println("Registered with the message manager." );
 
 			/* Now we create the humidity control status and message panel

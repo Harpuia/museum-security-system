@@ -6,12 +6,10 @@ import MessagePackage.Message;
 import MessagePackage.MessageManagerInterface;
 import MessagePackage.MessageQueue;
 
-import java.util.HashMap;
-
 /**
  * Created by yazid on 03-Mar-17.
  */
-public class SecurityMonitor extends MaintainableDevice implements Runnable {
+public class SecurityMonitor implements Runnable {
     //Constants
     private final String WINDOW_BREACH = "Window breach!";
     private final String DOOR_BREACH = "Door breach!";
@@ -160,10 +158,8 @@ public class SecurityMonitor extends MaintainableDevice implements Runnable {
         int messageQueueSize;
         Message message;
 
-        this.SendAliveSignal("Security Monitor", "Security monitor and its console.", messageInterface);
         if (messageInterface != null) {
-
-            SendAliveSignal("SecurityMonitor", "Hi, I'm the security monitor", messageInterface);
+            MaintenanceUtils.SendAliveSignal("Security Monitor", "Security monitor and its console.", messageInterface);
             //Initial status display
             messageWindow.WriteMessage("Registered with the message manager.");
             try {

@@ -6,7 +6,7 @@ import MessagePackage.MessageManagerInterface;
 /**
  * Created by yazid on 03-Mar-17.
  */
-public abstract class MaintainableDevice {
+public class MaintenanceUtils {
 
     //private boolean isStarted = false;
     private int msgID;
