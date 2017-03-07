@@ -1,5 +1,7 @@
 package SystemB;
 
+import java.util.Date;
+
 import static java.lang.Thread.sleep;
 
 /**
@@ -89,11 +91,12 @@ public class FireConsoleLauncher extends MaintainableDevice {
              * Specifically, this method will end when the fire alarm being turned off,
              * or the user doesn't give any response in 10 seconds.
              */
-            while ((state.getHasAlarm()) && countDown > 0) {
+            long startTime = System.currentTimeMillis();
+            while ((state.getHasAlarm()) && (System.currentTimeMillis() - startTime) <= 10000) {
                 sleep(SLEEP_MILLISECONDS);
 
                 /** countDown is used here to determine timeout. */
-                countDown -= SLEEP_MILLISECONDS;
+                //countDown -= SLEEP_MILLISECONDS;
             }
         } catch (InterruptedException e) {
             System.out.println("The console has been ended...");

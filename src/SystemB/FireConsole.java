@@ -45,23 +45,19 @@ public class FireConsole extends Thread {
             /** When the fire alarm doesn't arrive, the console shows the main menu. */
             if(!state.getHasAlarm()) {
                 System.out.println("\n\n\n\n");
-                System.out.println("Security System Command Console:");
+                System.out.println("Fire System Command Console:");
                 if (!msgMgrIP.equals(LOOPBACK_IP)) {
                     System.out.println("Using message manager at:" + msgMgrIP);
                 } else {
                     System.out.println("Using local message manager");
                 }
 
-                System.out.println("System security state: Not disarmed");
-                System.out.println("Select an option:");
-                System.out.println("1: Arm the system");
-                System.out.println("2: Disarm the system");
-
                 /** The user is only given control to turn off the sprinkler.
                   * This ONLY happens when the sprinkler is on.
                   */
                 if (state.getSprinklerOn()) {
-                    System.out.println("3: Turn off the sprinkler");
+                    System.out.println("Select an option:");
+                    System.out.println("1: Turn off the sprinkler");
                 }
                 System.out.println("X: Stop system");
                 System.out.print("\n>>>> ");
@@ -74,13 +70,13 @@ public class FireConsole extends Thread {
             else if (!state.getSprinklerOn()) {
                 FireConsoleLauncher.clearScreen();
                 System.out.println("***FIRE ALARM RECEIVED - TURNING ON THE SPRINKLER in 10 secs...***");
-                System.out.println("Press any key to confirm, or press Z to cancel");
+                System.out.println("Press 1 to confirm, or press 2 to cancel:");
                 System.out.print("\n>>>> ");
             } else {
                 FireConsoleLauncher.clearScreen();
                 System.out.println("***FIRE ALARM RECEIVED AND THE SPRINKLER IS ALREADY ON...");
                 System.out.println("If no directions received in 10 seconds, the sprinkler will remain on");
-                System.out.println("Press any key to continue, or press Z to cancel:");
+                System.out.println("Press 1 to continue, or press 2 to cancel:");
                 System.out.print("\n>>>> ");
             }
 
@@ -103,28 +99,8 @@ public class FireConsole extends Thread {
              *  The system does the corresponding operation based on user's input.
              */
             if (!state.getHasAlarm()) {
-                if (option.equals("1")) {
-                    if (state.getIsArmed()) {
-                        System.out.println("System is already armed. Press enter and input again.");
-                    } else {
-                        state.setIsArmed(true);
-                        System.out.println("System is successfully armed. " +
-                                "Security intrusions will be reported to the user.");
-                        System.out.println("Press enter to return to the menu.");
-                    }
-                } else if (option.equals("2")) {
-                    if (!state.getIsArmed()) {
-                        System.out.println("System is already disarmed. Press enter and input again.");
-                    } else {
-                        state.setIsArmed(false);
-                        System.out.println("System is successfully disarmed. " +
-                                "Security intrusions will NOT be reported to the user.");
-                        System.out.println("Press enter to return to the menu.");
-                    }
-                }
-
                 /** Note: The sprinkler can only be altered when it is on. */
-                else if (option.equals("3") && state.getSprinklerOn()) {
+                if (option.equals("1") && state.getSprinklerOn()) {
                     state.setSprinklerOn(false);
                     System.out.println("Sprinkler has successfully been turned off.");
                     System.out.println("Press enter to return to the menu.");
@@ -146,7 +122,7 @@ public class FireConsole extends Thread {
              *  The user inputs his/her options
              */
             else {
-                if (option.equals("Z")) {
+                if (option.equals("2")) {
                     /** Note: If the user CANCELS the alarm manually,
                      *  the alarm will be turned off.
                      */
@@ -155,13 +131,15 @@ public class FireConsole extends Thread {
 
                     System.out.println("Sprinkler turning on has been cancelled. Fire alarm is stopped.");
                     System.out.println("Press enter to return to the main menu.");
-                } else {
+                } else if (option.equals("1")){
                     /** Note: When the sprinkler is on, the alarm is automatically turned off*/
                     state.setSprinklerOn(true);
                     state.setHasAlarm(false);
 
                     System.out.println("Sprinkler has successfully been turned on, and the fire alarm is closed.");
                     System.out.println("Press enter to return to the main menu.");
+                } else {
+                    System.out.println("Input format wrong. Please try again.");
                 }
             }
 
