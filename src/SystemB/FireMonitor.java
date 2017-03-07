@@ -1,5 +1,6 @@
 package SystemB;
 
+import InstrumentationPackage.Indicator;
 import InstrumentationPackage.MessageWindow;
 import MessagePackage.Message;
 import MessagePackage.MessageManagerInterface;
@@ -16,7 +17,7 @@ public class FireMonitor implements Runnable {
     private final int FIRE_MSGID = 6;
     private final int SPRINKLER_MSGID = 7;
     private final int HALT_MSGID = 99;
-    private final int delay = 1000;
+    private final int delay = 500;
     private MessageManagerInterface msgMgrInterface;
     private String msgMgrIP;
     private boolean registered = true;
@@ -24,6 +25,7 @@ public class FireMonitor implements Runnable {
     private HashMap<Integer, Message> dataFromSensor = new HashMap<>();
     private FireState state;
     private boolean shutdown = false;
+    private Indicator fireIndicator;
 
 
     public void shutdown() {
@@ -91,13 +93,16 @@ public class FireMonitor implements Runnable {
         String fireMsgTxt = msg.GetMessage();
         msgWin.WriteMessage(fireMsgTxt);
         state.setHasAlarm(true);
+        fireIndicator.SetLampColorAndMessage("FIRE ALARM ON", 3);
     }
 
     @Override
     public void run () {
         if (msgMgrInterface != null) {
-            msgWin = new MessageWindow("Security Console", 0, 0);
+            msgWin = new MessageWindow("Fire Console", 0, 0);
             msgWin.WriteMessage("Registered with the message manager.");
+            fireIndicator = new Indicator("Fire Alarm OFF", msgWin.GetX(), msgWin.GetY() + msgWin.Height());
+
 
             try {
                 msgWin.WriteMessage("   Participant id: " + msgMgrInterface.GetMyId());
@@ -119,7 +124,12 @@ public class FireMonitor implements Runnable {
                     }
 
                     msgWin.WriteMessage("\n\nSimulation stopped.\n");
+                    fireIndicator.dispose();
                     break;
+                }
+
+                if(!state.getHasAlarm()) {
+                    fireIndicator.SetLampColorAndMessage("FIRE ALARM OFF", 1);
                 }
 
                 dataFromSensor.put(FIRE_MSGID, null);
