@@ -11,7 +11,7 @@ import MessagePackage.MessageQueue;
  * Created by Yuchao on 04/03/2017.
  */
 public class SprinklerController {
-    public static void main (String args[]) {
+    public static void main(String args[]) {
         final int SPRINKLER_MSGID = 7;
         final int HALT_MSGID = 99;
         final int DELAY = 500;
@@ -42,7 +42,7 @@ public class SprinklerController {
 
         if (messageManagerInterface != null) {
             //Sending alive message
-            MaintenanceUtils.SendAliveSignal("Sprinkler Controller", "The fire sprinkler controller.", messageManagerInterface);
+            MaintenanceUtils.SendAliveSignal(">> Sprinkler Controller", ">> Initial system sprinkler controller", messageManagerInterface);
             System.out.println("Registered with the message manager.");
             float WinPosX = 0;
             float WinPosY = 0;
@@ -56,14 +56,14 @@ public class SprinklerController {
                 System.out.println("Error:: " + e);
             }
 
-            while(true) {
+            while (true) {
                 try {
                     messageQueue = messageManagerInterface.GetMessageQueue();
                 } catch (Exception e) {
                     messageWindow.WriteMessage("Error getting message queue::" + e);
                 }
 
-                if(messageQueue == null) {
+                if (messageQueue == null) {
                     System.exit(0);
                 }
 
@@ -71,11 +71,11 @@ public class SprinklerController {
                 for (int i = 0; i < queueLength; i++) {
                     message = messageQueue.GetMessage();
                     if (message.GetMessageId() == SPRINKLER_MSGID) {
-                        if (message.GetMessage().equalsIgnoreCase("S1")) {
+                        if (message.GetMessage().equals("S1")) {
                             sprinklerState = true;
                             messageWindow.WriteMessage("Received sprinkler on message");
                             // Confirm message
-                        } else if (message.GetMessage().equalsIgnoreCase("S0")) {
+                        } else if (message.GetMessage().equals("S0")) {
                             sprinklerState = false;
                             messageWindow.WriteMessage("Received sprinkler off message");
                         }
@@ -90,7 +90,7 @@ public class SprinklerController {
                     }
                 }
 
-                if(sprinklerState) {
+                if (sprinklerState) {
                     sprinklerIndicator.SetLampColorAndMessage("SPRINKLER ON", 1);
                 } else {
                     sprinklerIndicator.SetLampColorAndMessage("SPRINKLER OFF", 0);

@@ -42,7 +42,7 @@ public class FireDetectorSimulator {
 
         if(msgMgrInterface != null) {
             //Sending alive message
-            MaintenanceUtils.SendAliveSignal("Fire Detector Simulator", "The fire detector simulator.", msgMgrInterface);
+            MaintenanceUtils.SendAliveSignal(">> Fire Detector Simulator",">> Initial system fire detector simulator", msgMgrInterface);
             while (true) {
                 try {
                     System.out.println("Enter 1 to simulate a fire event:");

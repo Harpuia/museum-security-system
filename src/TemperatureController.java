@@ -99,7 +99,7 @@ class TemperatureController
 
 		if (em != null)
 		{
-			MaintenanceUtils.SendAliveSignal("TemperatureController", "Hi, I'm the temperature controller", em);
+			MaintenanceUtils.SendAliveSignal(">> Temperature Controller",">> Initial system temperature controller", em);
 			System.out.println("Registered with the message manager." );
 
 			/* Now we create the temperature control status and message panel
