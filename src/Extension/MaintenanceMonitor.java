@@ -120,8 +120,24 @@ public class MaintenanceMonitor {
                             }
                         }
                     }
+                } else if (tmpMsg.GetMessageId() == 99 ){
+                    haltMonitor();
+                    done = true;
                 }
             }
+        }
+    }
+
+    /**
+     * Halt the monitor
+     */
+    public void haltMonitor() {
+
+        messageWindow.WriteMessage("***HALT MESSAGE RECEIVED - SHUTTING DOWN SYSTEM***");
+        try {
+            msgManagerIF.UnRegister();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
