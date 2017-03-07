@@ -5,24 +5,18 @@ package SystemB;
  */
 public class FireState {
     private boolean hasAlarm;
-    private boolean isArmed;
     private boolean sprinklerOn;
     private boolean isStop;
 
 
     public FireState() {
         hasAlarm = false;
-        isArmed = false;
         sprinklerOn = false;
         isStop = false;
     }
 
     public synchronized boolean getHasAlarm() {
         return hasAlarm;
-    }
-
-    public synchronized boolean getIsArmed() {
-        return isArmed;
     }
 
     public synchronized boolean getSprinklerOn() {
@@ -35,10 +29,6 @@ public class FireState {
 
     public synchronized void setHasAlarm(boolean hasAlarm) {
         this.hasAlarm = hasAlarm;
-    }
-
-    public synchronized void setIsArmed(boolean armed) {
-        isArmed = armed;
     }
 
     public synchronized void setSprinklerOn(boolean sprinklerOn) {

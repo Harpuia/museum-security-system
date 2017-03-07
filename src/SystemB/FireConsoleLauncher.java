@@ -7,11 +7,11 @@ import static java.lang.Thread.sleep;
 /**
  * This class is a wrapper process for both console thread and monitor thread.
  */
-public class FireConsoleLauncher extends MaintainableDevice {
+public class FireConsoleLauncher{
     private final String LOOPBACK_IP = "127.0.0.1";
 
     /** This constant is used when we are listening the fire alarm. */
-    private final int SLEEP_MILLISECONDS = 200;
+    private final int SLEEP_MILLISECONDS = 500;
 
     /** A remaining time used to compare to the timeout. */
     private int countDown;
