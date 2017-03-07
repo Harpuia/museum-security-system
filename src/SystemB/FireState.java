@@ -1,7 +1,7 @@
 package SystemB;
 
 /**
- * Created by Yuchao on 04/03/2017.
+ * A thread-safe data structure shared among threads.
  */
 public class FireState {
     private boolean hasAlarm;
@@ -31,6 +31,9 @@ public class FireState {
         this.hasAlarm = hasAlarm;
     }
 
+    /** When the state of sprinkler gets changed,
+     *  the system sets sprinklerChanged to be true.
+     */
     public synchronized void setSprinklerOn(boolean sprinklerOn) {
         this.sprinklerOn = sprinklerOn;
         sprinklerChanged = true;

@@ -8,7 +8,8 @@ import MessagePackage.MessageManagerInterface;
 import MessagePackage.MessageQueue;
 
 /**
- * Created by Yuchao on 04/03/2017.
+ * The sprinkler controller receives message about the sprinkler state.
+ * It controls the indicator.
  */
 public class SprinklerController {
     public static void main(String args[]) {
@@ -41,7 +42,7 @@ public class SprinklerController {
         }
 
         if (messageManagerInterface != null) {
-            //Sending alive message
+            /** Sending alive message */
             MaintenanceUtils.SendAliveSignal(">> Sprinkler Controller", ">> Initial system sprinkler controller", messageManagerInterface);
             System.out.println("Registered with the message manager.");
             float WinPosX = 0;
@@ -57,6 +58,7 @@ public class SprinklerController {
             }
 
             while (true) {
+                /** Reading from queue */
                 try {
                     messageQueue = messageManagerInterface.GetMessageQueue();
                 } catch (Exception e) {
@@ -90,6 +92,9 @@ public class SprinklerController {
                     }
                 }
 
+                /** After the controller receives the sprinkler message,
+                 *  it changes sprinkler indicator.
+                 */
                 if (sprinklerState) {
                     sprinklerIndicator.SetLampColorAndMessage("SPRINKLER ON", 1);
                 } else {

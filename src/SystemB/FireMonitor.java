@@ -12,22 +12,35 @@ import java.util.HashMap;
 import static java.lang.Thread.sleep;
 
 /**
- * Created by yazid on 03-Mar-17.
+ * the fire monitor thread sending and receiving message with message bus.
  */
 public class FireMonitor implements Runnable {
     private final int FIRE_MSGID = 6;
     private final int SPRINKLER_MSGID = 7;
     private final int HALT_MSGID = 99;
+
+    /** The system sleeps 500 milliseconds between every message read. */
     private final int delay = 500;
     private MessageManagerInterface messageManagerInterface;
-    private String msgMgrIP;
+    private String messageManagerIP;
     private boolean registered = true;
     private MessageWindow messageWindow;
+
+    /** The key is message id, and the value is the message. */
     private HashMap<Integer, Message> dataFromSensor = new HashMap<>();
+
+    /** The shared state */
     private FireState state;
+
+    /** The system uses a boolean variable to receive the shut down message */
     private boolean shutdown = false;
+
+    /**The monitor shows an indicator.*/
     private Indicator fireIndicator;
 
+    /**
+     * To halt the system by being called in the FireConsoleLauncher
+     */
     public void shutdown() {
         messageWindow.WriteMessage("***HALT MESSAGE RECEIVED - SHUTTING DOWN SYSTEM***");
         Message msg = new Message(HALT_MSGID, "XXX");
@@ -39,6 +52,10 @@ public class FireMonitor implements Runnable {
         this.shutdown = true;
     }
 
+    /**
+     * Constructor without ip address
+     * @param state to be passed by the main thread
+     */
     public FireMonitor(FireState state) {
         try {
             messageManagerInterface = new MessageManagerInterface();
@@ -52,10 +69,15 @@ public class FireMonitor implements Runnable {
         dataFromSensor.put(FIRE_MSGID, null);
     }
 
+    /**
+     * Constructor with ip address, being called when the system is started in a distributed fashion.
+     * @param msgIpAddress ip address of message manager
+     * @param state to be passed by the main thread
+     */
     public FireMonitor(String msgIpAddress, FireState state) {
-        msgMgrIP = msgIpAddress;
+        messageManagerIP = msgIpAddress;
         try {
-            messageManagerInterface = new MessageManagerInterface(msgMgrIP);
+            messageManagerInterface = new MessageManagerInterface(messageManagerIP);
         } catch (Exception e) {
             System.out.println("ECSMonitor::Error instantiating message manager interface: " + e);
             registered = false;
@@ -66,10 +88,17 @@ public class FireMonitor implements Runnable {
         dataFromSensor.put(FIRE_MSGID, null);
     }
 
+    /**
+     * check if the monitor is registered
+     * @return the result
+     */
     public boolean isRegistered() {
         return (registered);
     }
 
+    /**
+     * To fetch a queue from message manager, and store the data in the hash map.
+     */
     public void readMessage() {
         MessageQueue messageQueue = null;
         try {
@@ -82,12 +111,19 @@ public class FireMonitor implements Runnable {
         for (int i = 0; i < queueLength; i++) {
             Message message = messageQueue.GetMessage();
             int messageId = message.GetMessageId();
+
+            /** Note: the key is instantiated in the constructor to identify
+             *  what message id it accepts.
+             */
             if (dataFromSensor.containsKey(messageId)) {
                 dataFromSensor.put(messageId, message);
             }
         }
     }
 
+    /**
+     * The operations to be done when the monitor receives a fire.
+     */
     public void controlFire() {
         Message msg = dataFromSensor.get(FIRE_MSGID);
         String fireMsgTxt = msg.GetMessage();
@@ -100,7 +136,7 @@ public class FireMonitor implements Runnable {
     public void run() {
         if (messageManagerInterface != null) {
             //Sending alive message
-            MaintenanceUtils.SendAliveSignal(">> Fire Monitor",">> Initial system fire monitor", messageManagerInterface);
+            MaintenanceUtils.SendAliveSignal("Fire Monitor", "The fire monitor.", messageManagerInterface);
             messageWindow = new MessageWindow("Fire Monitor", 0, 0);
             messageWindow.WriteMessage("Registered with the message manager.");
             fireIndicator = new Indicator("Fire Alarm OFF", 0, 0);
@@ -127,14 +163,21 @@ public class FireMonitor implements Runnable {
                     fireIndicator.dispose();
                     break;
                 }
+
+                /** The system checks the fire alarm periodically, and show in the indicator.*/
                 if (!state.getHasAlarm()) {
                     fireIndicator.SetLampColorAndMessage("FIRE ALARM OFF", 1);
                 }
+
+                /** The system checks when the sprinkler gets changed, and sends to the controller. */
                 if (state.sprinklerChanged) {
                     this.sendCommandToSprinklerController();
                     state.sprinklerChanged = false;
                 }
+
+                /** Set the value to null to prepare for next receiving. */
                 dataFromSensor.put(FIRE_MSGID, null);
+
                 try {
                     sleep(delay);
                 } catch (InterruptedException e) {
@@ -147,6 +190,11 @@ public class FireMonitor implements Runnable {
 
     }
 
+    /**
+     * This method gets called when the sprinkler gets changed.
+     * It sends "S1" when the sprinkler gets on,
+     * and sends "S2" when the sprinkler gets off.
+     */
     public void sendCommandToSprinklerController() {
         if (state.getSprinklerOn()) {
             Message msgToSend = new Message(SPRINKLER_MSGID, "S1");
