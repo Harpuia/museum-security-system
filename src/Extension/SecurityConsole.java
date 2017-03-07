@@ -7,18 +7,21 @@ import TermioPackage.Termio;
  */
 public class SecurityConsole {
     public static void main(String[] args) {
+        //Input variables
         Termio termio = new Termio();
         String choice;
 
-        SecurityMonitor securityMonitor;
+        //Security variables
+        SecurityMonitor securityMonitor = new SecurityMonitor();
         boolean done = false;
         boolean armed = false;
 
-        securityMonitor = new SecurityMonitor();
+        //Starting the security monitor
         if (securityMonitor.isRegistered()) {
             Thread monitorThread = new Thread(securityMonitor);
             monitorThread.start();
             while (!done) {
+                //Displaying input prompt
                 System.out.println("Select an Option: \n");
                 System.out.print("\n>>>> ");
                 if (armed) {
@@ -29,15 +32,20 @@ public class SecurityConsole {
                 System.out.println("X: Stop System\n");
                 System.out.print("\n>>>> ");
 
+                //Reading input
                 choice = termio.KeyboardReadString();
+
+                //Parsing choices
                 if (choice.equals("X")) {
                     securityMonitor.Halt();
                     System.out.println( "\nSecurity console Stopped... Exit security monitor mindow to return to command prompt." );
                     done = true;
                     securityMonitor.Halt();
                 } else {
+                    //Converting/checking numeric value
                     int intChoice = termio.ToInteger(choice);
                     switch (intChoice) {
+                        //Switch between armed/disarmed
                         case 1:
                             if (armed) {
                                 securityMonitor.disarm();
