@@ -99,7 +99,7 @@ class ECSMonitor extends Thread
 
 		if (em != null)
 		{
-			MaintenanceUtils.SendAliveSignal("ECSMonitor","Hi, I'm the ECS monitor",em);
+			MaintenanceUtils.SendAliveSignal(">> ECS Monitor",">> Initial system ECS monitor",em);
 			// Now we create the ECS status and message panel
 			// Note that we set up two indicators that are initially yellow. This is
 			// because we do not know if the temperature/humidity is high/low.
