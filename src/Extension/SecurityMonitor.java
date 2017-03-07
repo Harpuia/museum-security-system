@@ -19,6 +19,9 @@ public class SecurityMonitor implements Runnable {
     private final String NO_MOVEMENT = "No movement";
     private final String SYSTEM_DISARMED = "System disarmed";
     private final long ALERT_DISPLAY_DURATION_MILLISECONDS = 10000;
+    private final int COLOR_BLACK = 0;
+    private final int COLOR_GREEN = 1;
+    private final int COLOR_RED = 3;
 
     //Messaging variables
     private final int HALT_MSGID = 99;
@@ -66,23 +69,12 @@ public class SecurityMonitor implements Runnable {
     }
 
     /**
-     * Constructor that registers the associated console
-     *
-     * @param console Security Console associated to the Security Monitor
-     */
-    public SecurityMonitor(SecurityConsole console) {
-        this();
-        this.associatedConsole = console;
-    }
-
-    /**
      * Constructor that registers the associated console and a message manager IP address
      *
      * @param msgIpAddress IP address of the message manager
-     * @param console      Security Console associated to the Security Monitor
      */
-    public SecurityMonitor(String msgIpAddress, SecurityConsole console) {
-        this(console);
+    public SecurityMonitor(String msgIpAddress) {
+        this();
         messageManagerIP = msgIpAddress;
         try {
             messageInterface = new MessageManagerInterface(messageManagerIP);
@@ -92,10 +84,17 @@ public class SecurityMonitor implements Runnable {
         }
     }
 
+    /**
+     * Returns whether the Security Monitor is registered with the message bus
+     * @return true if the Security Monitor is registered with the message bus, false otherwise
+     */
     public boolean isRegistered() {
         return (registered);
     }
 
+    /**
+     * Reads message queue
+     */
     public void readMessageQueue() {
         try {
             messageQueue = messageInterface.GetMessageQueue();
@@ -104,38 +103,53 @@ public class SecurityMonitor implements Runnable {
         }
     }
 
+    /**
+     * Arms the security system
+     */
     public void arm() {
         armed = true;
         //Setting system state to OK
-        windowIndicator.SetLampColorAndMessage(WINDOW_OK, 1);
-        doorIndicator.SetLampColorAndMessage(DOOR_OK, 1);
-        movementIndicator.SetLampColorAndMessage(NO_MOVEMENT, 1);
+        windowIndicator.SetLampColorAndMessage(WINDOW_OK, COLOR_GREEN);
+        doorIndicator.SetLampColorAndMessage(DOOR_OK, COLOR_GREEN);
+        movementIndicator.SetLampColorAndMessage(NO_MOVEMENT, COLOR_GREEN);
     }
 
+    /**
+     * Disarms the security system
+     */
     public void disarm() {
         armed = false;
         //Resetting indicators
-        windowIndicator.SetLampColorAndMessage(SYSTEM_DISARMED, 0);
-        doorIndicator.SetLampColorAndMessage(SYSTEM_DISARMED, 0);
-        movementIndicator.SetLampColorAndMessage(SYSTEM_DISARMED, 0);
+        windowIndicator.SetLampColorAndMessage(SYSTEM_DISARMED, COLOR_BLACK);
+        doorIndicator.SetLampColorAndMessage(SYSTEM_DISARMED, COLOR_BLACK);
+        movementIndicator.SetLampColorAndMessage(SYSTEM_DISARMED, COLOR_BLACK);
     }
 
-    public void Halt() {
+    /**
+     * Sends the halt signal to the Message Manager then halts the monitor
+     */
+    public void halt() {
         messageWindow.WriteMessage("***HALT MESSAGE RECEIVED - SHUTTING DOWN SYSTEM***");
 
         // Here we create the stop message.
-
         Message msg;
-
         msg = new Message((int) 99, "XXX");
 
         // Here we send the message to the message manager.
-
         try {
             messageInterface.SendMessage(msg);
         } catch (Exception e) {
             System.out.println("Error sending halt message:: " + e);
         }
+
+        //Internal halt
+        this.internalHalt();
+    }
+
+    /**
+     * Halts the monitor
+     */
+    public void internalHalt() {
         doorIndicator.dispose();
         windowIndicator.dispose();
         movementIndicator.dispose();
@@ -159,7 +173,9 @@ public class SecurityMonitor implements Runnable {
         Message message;
 
         if (messageInterface != null) {
+            //Sending alive message
             MaintenanceUtils.SendAliveSignal("Security Monitor", "Security monitor and its console.", messageInterface);
+
             //Initial status display
             messageWindow.WriteMessage("Registered with the message manager.");
             try {
@@ -174,21 +190,21 @@ public class SecurityMonitor implements Runnable {
                 if (armed) {
                     //Updating indicators
                     if (lastDoorAlert != null && (System.currentTimeMillis() - lastDoorAlert) > ALERT_DISPLAY_DURATION_MILLISECONDS) {
-                        doorIndicator.SetLampColorAndMessage(DOOR_OK, 1);
+                        doorIndicator.SetLampColorAndMessage(DOOR_OK, COLOR_GREEN);
                         lastDoorAlert = null;
                     }
                     if (lastWindowAlert != null && (System.currentTimeMillis() - lastWindowAlert) > ALERT_DISPLAY_DURATION_MILLISECONDS) {
-                        windowIndicator.SetLampColorAndMessage(WINDOW_OK, 1);
+                        windowIndicator.SetLampColorAndMessage(WINDOW_OK, COLOR_GREEN);
                         lastWindowAlert = null;
                     }
                     if (lastMovementAlert != null && (System.currentTimeMillis() - lastMovementAlert) > ALERT_DISPLAY_DURATION_MILLISECONDS) {
-                        movementIndicator.SetLampColorAndMessage(DOOR_OK, 1);
+                        movementIndicator.SetLampColorAndMessage(DOOR_OK, COLOR_GREEN);
                         lastMovementAlert = null;
                     }
                 }
 
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(500);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -205,23 +221,24 @@ public class SecurityMonitor implements Runnable {
                                 switch (message.GetMessage()) {
                                     case "W":
                                         messageWindow.WriteMessage(WINDOW_BREACH);
-                                        windowIndicator.SetLampColorAndMessage(WINDOW_BREACH, 3);
+                                        windowIndicator.SetLampColorAndMessage(WINDOW_BREACH, COLOR_RED);
                                         lastWindowAlert = System.currentTimeMillis();
                                         break;
                                     case "M":
                                         messageWindow.WriteMessage(MOVEMENT_DETECTED);
-                                        movementIndicator.SetLampColorAndMessage(MOVEMENT_DETECTED, 3);
+                                        movementIndicator.SetLampColorAndMessage(MOVEMENT_DETECTED, COLOR_RED);
                                         lastMovementAlert = System.currentTimeMillis();
                                         break;
                                     case "D":
                                         messageWindow.WriteMessage(DOOR_BREACH);
-                                        doorIndicator.SetLampColorAndMessage(DOOR_BREACH, 3);
+                                        doorIndicator.SetLampColorAndMessage(DOOR_BREACH, COLOR_RED);
                                         lastDoorAlert = System.currentTimeMillis();
                                         break;
                                 }
                             break;
                         case 99:
-                            Halt();
+                            this.internalHalt();
+                            done = true;
                             break;
                         default:
                             break;

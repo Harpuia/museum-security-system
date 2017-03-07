@@ -2,7 +2,7 @@ package Extension;
 
 import java.util.*;
 
-/*
+/**
  * The class is used as WatchDogTimer utility
  * this class will maintain a list of device record and a set of device name
  * The device record will keep device name, device descrption and device status

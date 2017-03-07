@@ -12,7 +12,12 @@ public class SecurityConsole {
         String choice;
 
         //Security variables
-        SecurityMonitor securityMonitor = new SecurityMonitor();
+        SecurityMonitor securityMonitor;
+        if (args.length > 0) {
+            securityMonitor = new SecurityMonitor(args[0]);
+        } else {
+            securityMonitor = new SecurityMonitor();
+        }
         boolean done = false;
         boolean armed = false;
 
@@ -37,10 +42,10 @@ public class SecurityConsole {
 
                 //Parsing choices
                 if (choice.equals("X")) {
-                    securityMonitor.Halt();
+                    securityMonitor.halt();
                     System.out.println( "\nSecurity console Stopped... Exit security monitor mindow to return to command prompt." );
                     done = true;
-                    securityMonitor.Halt();
+                    securityMonitor.halt();
                 } else {
                     //Converting/checking numeric value
                     int intChoice = termio.ToInteger(choice);
