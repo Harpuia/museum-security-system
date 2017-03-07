@@ -100,7 +100,7 @@ public class FireMonitor implements Runnable {
     public void run() {
         if (messageManagerInterface != null) {
             //Sending alive message
-            MaintenanceUtils.SendAliveSignal("Fire Monitor", "The fire monitor.", messageManagerInterface);
+            MaintenanceUtils.SendAliveSignal(">> Fire Monitor",">> Initial system fire monitor", messageManagerInterface);
             messageWindow = new MessageWindow("Fire Console", 0, 0);
             messageWindow.WriteMessage("Registered with the message manager.");
             fireIndicator = new Indicator("Fire Alarm OFF", 0, 0);
