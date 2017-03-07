@@ -12,7 +12,7 @@ import java.util.List;
  * MaintenanceMonitor is used to receive alive-message from working devices, including
  * sensor, monitor(except for Maintenance Monitor) and controller
  */
-public class MaintenanceMonitor extends Thread {
+public class MaintenanceMonitor {
     /**
      * Member Variables
      **/
@@ -23,7 +23,7 @@ public class MaintenanceMonitor extends Thread {
     private WatchDogTimerUtil watchDogTimerUtil;
 
     /**
-     * Constructor
+     * Default constructor
      **/
     public MaintenanceMonitor() {
         try {
@@ -36,6 +36,11 @@ public class MaintenanceMonitor extends Thread {
         }
     }
 
+    /**
+     * Constructor with remote connection
+     *
+     * @param MsgIpAddress Message Manager IP address
+     */
     public MaintenanceMonitor(String MsgIpAddress) {
         // message manager is not on the local system
         msgMgrIP = MsgIpAddress;
@@ -49,8 +54,10 @@ public class MaintenanceMonitor extends Thread {
         }
     }
 
-    public void run() {
-
+    /**
+     * Main method
+     */
+    public void startMonitoring() {
         Message tmpMsg = null;
         boolean done = false;
         MessageQueue messageQueue = null;
@@ -58,6 +65,11 @@ public class MaintenanceMonitor extends Thread {
         Timestamp feedTime = new Timestamp(System.currentTimeMillis());
 
         while (!done) {
+            try {
+                Thread.sleep(500);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             Timestamp curTime = new Timestamp(System.currentTimeMillis());
             long timeSlot = curTime.getTime() - feedTime.getTime();
             // every 1 sec, we invoke timer in WatchDog, if someone new is hungry then
@@ -82,14 +94,12 @@ public class MaintenanceMonitor extends Thread {
                 messageQueue = msgManagerIF.GetMessageQueue();
             } catch (Exception e) {
                 messageWindow.WriteMessage("Error getting message queue::" + e);
-
             }
             // read messages
             int qlen = messageQueue.GetSize();
             for (int i = 0; i < qlen; i++) {
                 tmpMsg = messageQueue.GetMessage();
                 if (tmpMsg.GetMessageId() == 3) {
-                    //idToCount.put(Msg.GetSenderId(), number);
                     String[] msgPartition = tmpMsg.GetMessage().split(" : ");
                     String msgName = msgPartition[0];
                     String msgDescription = msgPartition[1];
@@ -113,18 +123,20 @@ public class MaintenanceMonitor extends Thread {
                 }
             }
         }
-
     }
 
-    // TODO: Add parsing the args for connecting remote message manager -> Huang Xin
+    /**
+     * Main method
+     *
+     * @param args
+     */
     public static void main(String[] args) {
-        if (args[0].length() != 0) {
-            MaintenanceMonitor maintenMonitor = new MaintenanceMonitor(args[0]);
-            maintenMonitor.start();
+        MaintenanceMonitor maintenanceMonitor;
+        if (args.length > 0) {
+            maintenanceMonitor = new MaintenanceMonitor(args[0]);
         } else {
-            MaintenanceMonitor maintenMonitor = new MaintenanceMonitor();
-            maintenMonitor.start();
+            maintenanceMonitor = new MaintenanceMonitor();
         }
+        maintenanceMonitor.startMonitoring();
     }
-
 }

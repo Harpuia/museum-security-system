@@ -47,27 +47,15 @@ public class DeviceRecord{
     @Override
     public String toString() {
         if(countDownNum <= 0){
-            return name + " : " + description + "     no responding";
+            return name + " : " + description + " disconnected.";
         }else{
             return name + " : " + description;
         }
     }
 
     /** Getter and Setter **/
-    public long getSenderID() {
-        return senderID;
-    }
-
-    public void setSenderID(long senderID) {
-        this.senderID = senderID;
-    }
-
     public String getName() {
         return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public String getDescription() {
