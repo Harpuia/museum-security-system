@@ -31,8 +31,9 @@ public class FireState {
         this.hasAlarm = hasAlarm;
     }
 
-    /** When the state of sprinkler gets changed,
-     *  the system sets sprinklerChanged to be true.
+    /**
+     * When the state of sprinkler gets changed,
+     * the system sets sprinklerChanged to be true.
      */
     public synchronized void setSprinklerOn(boolean sprinklerOn) {
         this.sprinklerOn = sprinklerOn;

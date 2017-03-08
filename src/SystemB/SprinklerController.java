@@ -1,5 +1,6 @@
 package SystemB;
 
+import InstrumentationPackage.GraphicConstants;
 import SystemC.MaintenanceUtils;
 import InstrumentationPackage.Indicator;
 import InstrumentationPackage.MessageWindow;
@@ -43,12 +44,10 @@ public class SprinklerController {
 
         if (messageManagerInterface != null) {
             /** Sending alive message */
-            MaintenanceUtils.SendAliveSignal(">> Sprinkler Controller", ">> Initial system sprinkler controller", messageManagerInterface);
+            MaintenanceUtils.SendAliveSignal(">> Sprinkler Controller", ">> System B sprinkler controller", messageManagerInterface);
             System.out.println("Registered with the message manager.");
-            float WinPosX = 0;
-            float WinPosY = 0;
-            MessageWindow messageWindow = new MessageWindow("Sprinkler Controller Status Console", WinPosX, WinPosY);
-            Indicator sprinklerIndicator = new Indicator("Sprinkler OFF", WinPosX, WinPosY + messageWindow.Height());
+            MessageWindow messageWindow = new MessageWindow("Sprinkler Controller Status Console", 0, 2 * GraphicConstants.MESSAGE_WINDOW_Y_OFFSET);
+            Indicator sprinklerIndicator = new Indicator("Sprinkler OFF", GraphicConstants.INDICATOR_X_OFFSET, 4* GraphicConstants.INDICATOR_Y_OFFSET);
             messageWindow.WriteMessage("Registered with the message manager.");
             try {
                 messageWindow.WriteMessage("Participant id: " + messageManagerInterface.GetMyId());

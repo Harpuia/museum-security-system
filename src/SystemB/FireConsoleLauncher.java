@@ -7,26 +7,34 @@ import static java.lang.Thread.sleep;
 /**
  * This class is a wrapper process for both console thread and monitor thread.
  */
-public class FireConsoleLauncher{
+public class FireConsoleLauncher {
     private final String LOOPBACK_IP = "127.0.0.1";
 
-    /** This constant is used when we are listening the fire alarm. */
+    /**
+     * This constant is used when we are listening the fire alarm.
+     */
     private final int SLEEP_MILLISECONDS = 500;
 
-    /** A remaining time used to compare to the timeout. */
+    /**
+     * A remaining time used to compare to the timeout.
+     */
     private int countDown;
 
-    /** Both monitor and console threads are instantiated in the launcher. */
+    /**
+     * Both monitor and console threads are instantiated in the launcher.
+     */
     private FireMonitor monitor;
     private FireConsole console;
 
-    /** The instance of the thread-safe critical data.
-     *  This instance is passed into every threads that they can all access.
+    /**
+     * The instance of the thread-safe critical data.
+     * This instance is passed into every threads that they can all access.
      */
     private FireState state = new FireState();
 
     /**
      * A wrapper method to construct a monitor thread
+     *
      * @param args The command line arguments
      * @return An initiated FireMonitor object
      */
@@ -40,6 +48,7 @@ public class FireConsoleLauncher{
 
     /**
      * A wrapper method to construct a console thread
+     *
      * @param args The command line arguments
      * @return An initiated FireConsole object
      */
@@ -84,6 +93,7 @@ public class FireConsoleLauncher{
 
     /**
      * Another method listening to the fire alarm being turned off in ten seconds.
+     *
      * @param lastFireDetected Last time the system detects the fire
      */
     private void listenToAlarmInTenSec(long lastFireDetected) {
@@ -106,7 +116,7 @@ public class FireConsoleLauncher{
      * thread and the monitor thread. Finally the whole process will be closed.
      */
     private void checkHalt() {
-        if(state.getIsStop()) {
+        if (state.getIsStop()) {
             console.shutdown();
             monitor.shutdown();
             System.exit(0);
@@ -116,9 +126,10 @@ public class FireConsoleLauncher{
     /**
      * The whole workflow of the "main" thread.
      * The system is constantly listening the state of fire alarm.
+     *
      * @param args The command line arguments.
      */
-    private void launch (String[] args) {
+    private void launch(String[] args) {
         monitor = constructMonitor(args);
         console = constructConsole(args);
 
@@ -133,7 +144,7 @@ public class FireConsoleLauncher{
             new Thread(monitor).start();
             console.start();
 
-            while(true) {
+            while (true) {
                 /** The system is checking if halt signal arrives between listening operations. */
                 checkHalt();
                 listenToAlarm();
@@ -174,7 +185,7 @@ public class FireConsoleLauncher{
         }
     }
 
-    public static void main (String[] args) {
+    public static void main(String[] args) {
         (new FireConsoleLauncher()).launch(args);
     }
 }

@@ -46,7 +46,7 @@ public class SecuritySimulator {
 
         if (messageInterface != null) {
             //Sending alive message
-            MaintenanceUtils.SendAliveSignal(">> Security Simulator",">> Initial system security simulator", messageInterface);
+            MaintenanceUtils.SendAliveSignal(">> Security Simulator", ">> System A security simulator", messageInterface);
             System.out.println("Registered with the message manager.");
             try {
                 System.out.println("   Participant id: " + messageInterface.GetMyId());

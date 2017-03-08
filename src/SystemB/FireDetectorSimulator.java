@@ -12,7 +12,7 @@ import java.io.InputStreamReader;
  * This simulator will send fire message to the message bus.
  */
 public class FireDetectorSimulator {
-    public static void main (String[] args) {
+    public static void main(String[] args) {
         final int FIRE_MSGID = 6;
 
         String option;
@@ -44,14 +44,14 @@ public class FireDetectorSimulator {
             }
         }
 
-        if(msgMgrInterface != null) {
+        if (msgMgrInterface != null) {
             /** Sending alive message */
-            MaintenanceUtils.SendAliveSignal(">> Fire Detector Simulator",">> Initial system fire detector simulator", msgMgrInterface);
+            MaintenanceUtils.SendAliveSignal(">> Fire Detector Simulator", ">> Initial system fire detector simulator", msgMgrInterface);
             while (true) {
                 try {
                     System.out.println("Enter 1 to simulate a fire event:");
                     option = myReader.readLine();
-                    if(option.equals("1")) {
+                    if (option.equals("1")) {
                         /** Sending message to the fire monitor. */
                         msg = new Message(FIRE_MSGID, msgText);
                         msgMgrInterface.SendMessage(msg);

@@ -1,5 +1,6 @@
 package SystemB;
 
+import InstrumentationPackage.GraphicConstants;
 import SystemC.MaintenanceUtils;
 import InstrumentationPackage.Indicator;
 import InstrumentationPackage.MessageWindow;
@@ -19,23 +20,33 @@ public class FireMonitor implements Runnable {
     private final int SPRINKLER_MSGID = 7;
     private final int HALT_MSGID = 99;
 
-    /** The system sleeps 500 milliseconds between every message read. */
+    /**
+     * The system sleeps 500 milliseconds between every message read.
+     */
     private final int delay = 500;
     private MessageManagerInterface messageManagerInterface;
     private String messageManagerIP;
     private boolean registered = true;
     private MessageWindow messageWindow;
 
-    /** The key is message id, and the value is the message. */
+    /**
+     * The key is message id, and the value is the message.
+     */
     private HashMap<Integer, Message> dataFromSensor = new HashMap<>();
 
-    /** The shared state */
+    /**
+     * The shared state
+     */
     private FireState state;
 
-    /** The system uses a boolean variable to receive the shut down message */
+    /**
+     * The system uses a boolean variable to receive the shut down message
+     */
     private boolean shutdown = false;
 
-    /**The monitor shows an indicator.*/
+    /**
+     * The monitor shows an indicator.
+     */
     private Indicator fireIndicator;
 
     /**
@@ -54,6 +65,7 @@ public class FireMonitor implements Runnable {
 
     /**
      * Constructor without ip address
+     *
      * @param state to be passed by the main thread
      */
     public FireMonitor(FireState state) {
@@ -71,8 +83,9 @@ public class FireMonitor implements Runnable {
 
     /**
      * Constructor with ip address, being called when the system is started in a distributed fashion.
+     *
      * @param msgIpAddress ip address of message manager
-     * @param state to be passed by the main thread
+     * @param state        to be passed by the main thread
      */
     public FireMonitor(String msgIpAddress, FireState state) {
         messageManagerIP = msgIpAddress;
@@ -90,6 +103,7 @@ public class FireMonitor implements Runnable {
 
     /**
      * check if the monitor is registered
+     *
      * @return the result
      */
     public boolean isRegistered() {
@@ -136,10 +150,10 @@ public class FireMonitor implements Runnable {
     public void run() {
         if (messageManagerInterface != null) {
             //Sending alive message
-            MaintenanceUtils.SendAliveSignal("Fire Monitor", "The fire monitor.", messageManagerInterface);
-            messageWindow = new MessageWindow("Fire Monitor", 0, 0);
+            MaintenanceUtils.SendAliveSignal(">> Fire Monitor", ">> System B fire monitor", messageManagerInterface);
+            messageWindow = new MessageWindow("Fire Monitor", 0, GraphicConstants.MESSAGE_WINDOW_Y_OFFSET);
             messageWindow.WriteMessage("Registered with the message manager.");
-            fireIndicator = new Indicator("Fire Alarm OFF", 0, 0);
+            fireIndicator = new Indicator("Fire Alarm OFF", GraphicConstants.INDICATOR_X_OFFSET, 3 * GraphicConstants.INDICATOR_Y_OFFSET);
 
             try {
                 messageWindow.WriteMessage("   Participant id: " + messageManagerInterface.GetMyId());

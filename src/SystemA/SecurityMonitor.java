@@ -1,5 +1,6 @@
 package SystemA;
 
+import InstrumentationPackage.GraphicConstants;
 import SystemC.MaintenanceUtils;
 import InstrumentationPackage.Indicator;
 import InstrumentationPackage.MessageWindow;
@@ -49,12 +50,12 @@ public class SecurityMonitor implements Runnable {
      */
     public SecurityMonitor() {
         //Initializing windows
-        messageWindow = new MessageWindow("Security Monitor", 0, 100);
-        doorIndicator = new Indicator("Door indicator", 200, 100);
+        messageWindow = new MessageWindow("Security Monitor", 0, 0);
+        doorIndicator = new Indicator("Door indicator", GraphicConstants.INDICATOR_X_OFFSET, 0);
         doorIndicator.SetLampColorAndMessage(SYSTEM_DISARMED, 0);
-        windowIndicator = new Indicator("Window indicator", 200, 200);
+        windowIndicator = new Indicator("Window indicator", GraphicConstants.INDICATOR_X_OFFSET, GraphicConstants.INDICATOR_Y_OFFSET);
         windowIndicator.SetLampColorAndMessage(SYSTEM_DISARMED, 0);
-        movementIndicator = new Indicator("Movement indicator", 200, 300);
+        movementIndicator = new Indicator("Movement indicator", GraphicConstants.INDICATOR_X_OFFSET, 2 * GraphicConstants.INDICATOR_Y_OFFSET);
         movementIndicator.SetLampColorAndMessage(SYSTEM_DISARMED, 0);
 
         //Initializing variables
@@ -87,6 +88,7 @@ public class SecurityMonitor implements Runnable {
 
     /**
      * Returns whether the Security Monitor is registered with the message bus
+     *
      * @return true if the Security Monitor is registered with the message bus, false otherwise
      */
     public boolean isRegistered() {
@@ -175,7 +177,7 @@ public class SecurityMonitor implements Runnable {
 
         if (messageInterface != null) {
             //Sending alive message
-            MaintenanceUtils.SendAliveSignal(">> Security Monitor",">> Initial system security monitor", messageInterface);
+            MaintenanceUtils.SendAliveSignal(">> Security Monitor", ">> System A security monitor", messageInterface);
             //Initial status display
             messageWindow.WriteMessage("Registered with the message manager.");
             try {

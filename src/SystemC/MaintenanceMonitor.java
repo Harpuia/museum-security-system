@@ -1,5 +1,6 @@
 package SystemC;
 
+import InstrumentationPackage.GraphicConstants;
 import InstrumentationPackage.MessageWindow;
 import MessagePackage.Message;
 import MessagePackage.MessageManagerInterface;
@@ -28,7 +29,7 @@ public class MaintenanceMonitor {
     public MaintenanceMonitor() {
         try {
             msgManagerIF = new MessageManagerInterface();
-            messageWindow = new MessageWindow("MaintenanceMonitor", 10, 20);
+            messageWindow = new MessageWindow("Maintenance Monitor", 0, 3 * GraphicConstants.MESSAGE_WINDOW_Y_OFFSET);
             watchDogTimerUtil = new WatchDogTimerUtil();
         } catch (Exception e) {
             System.out.println("ECSMonitor::Error instantiating message manager interface: " + e);

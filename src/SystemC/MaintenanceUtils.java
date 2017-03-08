@@ -25,7 +25,7 @@ public class MaintenanceUtils {
         private String description;
         private MessageManagerInterface em;
 
-        public AliveThread(String name, String description, MessageManagerInterface em){
+        public AliveThread(String name, String description, MessageManagerInterface em) {
             this.name = name;
             this.description = description;
             this.em = em;

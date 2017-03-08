@@ -11,13 +11,17 @@ public class FireConsole extends Thread {
     private final String LOOPBACK_IP = "127.0.0.1";
     private String msgMgrIP;
 
-    /** The reference of the shared object */
+    /**
+     * The reference of the shared object
+     */
     private FireState state;
 
     private BufferedReader myReader =
             new BufferedReader(new InputStreamReader(System.in));
 
-    /** Used in halting */
+    /**
+     * Used in halting
+     */
     boolean shutdown = false;
 
     /**
@@ -29,8 +33,9 @@ public class FireConsole extends Thread {
 
     /**
      * Constructor of the fire console
+     *
      * @param msgMgrIP ip address of message manager
-     * @param state shared state passed by the launcher
+     * @param state    shared state passed by the launcher
      */
     public FireConsole(String msgMgrIP, FireState state) {
         this.msgMgrIP = msgMgrIP;
@@ -43,7 +48,7 @@ public class FireConsole extends Thread {
             String option = null;
 
             /** When the fire alarm doesn't arrive, the console shows the main menu. */
-            if(!state.getHasAlarm()) {
+            if (!state.getHasAlarm()) {
                 System.out.println("\n\n\n\n");
                 System.out.println("Fire System Command Console:");
                 if (!msgMgrIP.equals(LOOPBACK_IP)) {
@@ -53,8 +58,8 @@ public class FireConsole extends Thread {
                 }
 
                 /** The user is only given control to turn off the sprinkler.
-                  * This ONLY happens when the sprinkler is on.
-                  */
+                 * This ONLY happens when the sprinkler is on.
+                 */
                 if (state.getSprinklerOn()) {
                     System.out.println("Select an option:");
                     System.out.println("1: Turn off the sprinkler");
@@ -131,7 +136,7 @@ public class FireConsole extends Thread {
 
                     System.out.println("Sprinkler turning on has been cancelled. Fire alarm is stopped.");
                     System.out.println("Press enter to return to the main menu.");
-                } else if (option.equals("1")){
+                } else if (option.equals("1")) {
                     /** Note: When the sprinkler is on, the alarm is automatically turned off*/
                     state.setSprinklerOn(true);
                     state.setHasAlarm(false);
@@ -142,7 +147,6 @@ public class FireConsole extends Thread {
                     System.out.println("Input format wrong. Please try again.");
                 }
             }
-
 
             try {
                 /** We add an enter between the switching of two menus. */

@@ -43,7 +43,7 @@ public class SecurityConsole {
                 //Parsing choices
                 if (choice.equals("X")) {
                     securityMonitor.halt();
-                    System.out.println( "\nSecurity console Stopped... Exit security monitor mindow to return to command prompt." );
+                    System.out.println("\nSecurity console Stopped... Exit security monitor mindow to return to command prompt.");
                     done = true;
                     securityMonitor.halt();
                 } else {
