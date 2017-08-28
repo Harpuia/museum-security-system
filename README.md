@@ -1,4 +1,4 @@
-# Museum Security System built using Message Passing Architectural Style
+# Museum Security System
 
 This is a museum security system which requires multiple entities synchronized over network. The highlight of this code is the architectural design of a centeral message router. Core functionalities:
 
